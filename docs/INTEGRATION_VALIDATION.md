@@ -45,4 +45,4 @@ The first sandboxed Gateway attempt encountered file/connection permission error
 
 The source-only snapshot excludes team history, root self-capture, `.aica`, private databases, endpoint/session state, credentials, installed dependencies and model weights. A high-signal key scan found two intentional synthetic provider-key strings in redaction tests; no real key was identified in the selected source. Legacy workstation paths and a private tracker URL were removed from five copied documents. This is a scoped source review, not a guarantee about every free-text field in future user data.
 
-Original contributors remain credited in `NOTICE.md` and `INTEGRATION_SOURCES.md`. No root open-source license has been selected. The repository is initially private; public visibility is a separate final review decision.
+Original contributors remain credited in `NOTICE.md` and `INTEGRATION_SOURCES.md`. No root open-source license has been selected. The repository was prepared privately, then made public after the owner's explicit final review approval on 2026-10-19 (Asia/Tokyo). Public visibility does not itself grant an open-source license.
