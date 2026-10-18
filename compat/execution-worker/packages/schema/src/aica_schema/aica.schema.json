@@ -1,0 +1,177 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:aica:schema:0.1",
+  "title": "AiCA Archive v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["aica_version", "metadata", "variables", "interactive_questions", "graph", "artifacts", "harnesses", "agents", "sessions", "runs", "snapshot"],
+  "properties": {
+    "aica_version": {"const": "0.1"},
+    "metadata": {
+      "type": "object", "additionalProperties": false,
+      "required": ["project_id", "title", "source_mode", "created_at", "updated_at", "external_links"],
+      "properties": {
+        "project_id": {"$ref": "#/$defs/id"}, "title": {"type": "string", "maxLength": 1000},
+        "creator": {"type": "string"}, "source_mode": {"enum": ["live_recorded", "extracted", "imported", "mixed"]},
+        "created_at": {"$ref": "#/$defs/time"}, "updated_at": {"$ref": "#/$defs/time"},
+        "external_links": {"type": "array", "items": {"type": "string", "format": "uri"}},
+        "license": {"type": "string"}, "attribution": {"type": "string"}
+      }
+    },
+    "variables": {"type": "object", "additionalProperties": {"$ref": "#/$defs/variable"}},
+    "interactive_questions": {"type": "array", "items": {"$ref": "#/$defs/question"}},
+    "variable_operations": {"type": "array", "items": {"$ref": "#/$defs/operation"}},
+    "graph": {"$ref": "#/$defs/graph"},
+    "artifacts": {"type": "array", "items": {"$ref": "#/$defs/artifact"}},
+    "harnesses": {"type": "array", "items": {"$ref": "#/$defs/harness"}},
+    "agents": {"type": "array", "items": {"$ref": "#/$defs/agent"}},
+    "sessions": {"type": "array", "items": {"$ref": "#/$defs/session"}},
+    "runs": {"type": "array", "items": {"$ref": "#/$defs/run"}},
+    "history": {"type": "array", "items": {"$ref": "#/$defs/history"}},
+    "snapshot": {"$ref": "#/$defs/snapshot"},
+    "extensions": {"type": "object", "properties": {"aica.embedded_artifacts": {"$ref": "#/$defs/embedded_artifacts"}}}
+  },
+  "$defs": {
+    "embedded_artifacts": {
+      "type": "object", "additionalProperties": false, "required": ["version", "encoding", "objects"],
+      "properties": {
+        "version": {"const": "0.1"}, "encoding": {"const": "base64"},
+        "objects": {"type": "object", "maxProperties": 4096, "propertyNames": {"pattern": "^[a-f0-9]{64}$"}, "additionalProperties": {"type": "string", "maxLength": 89478488}}
+      }
+    },
+    "id": {"type": "string", "minLength": 1, "maxLength": 200, "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$"},
+    "time": {"type": "string", "format": "date-time"},
+    "nullable_id": {"oneOf": [{"$ref": "#/$defs/id"}, {"type": "null"}]},
+    "ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+    "provenance": {
+      "type": "object", "additionalProperties": false, "required": ["mode", "evidence"],
+      "properties": {
+        "mode": {"enum": ["recorded", "extracted", "inferred"]},
+        "evidence": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["source"], "properties": {"source": {"type": "string"}, "line": {"type": "integer", "minimum": 1}, "commit": {"type": "string"}, "artifact_id": {"$ref": "#/$defs/id"}}}},
+        "missing": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "binding": {
+      "oneOf": [
+        {"type": "object", "additionalProperties": false, "required": ["kind", "value"], "properties": {"kind": {"const": "literal"}, "value": {}}},
+        {"type": "object", "additionalProperties": false, "required": ["kind", "variable_id"], "properties": {"kind": {"const": "variable"}, "variable_id": {"$ref": "#/$defs/id"}}},
+        {"type": "object", "additionalProperties": false, "required": ["kind", "node_id", "output"], "properties": {"kind": {"const": "node_output"}, "node_id": {"$ref": "#/$defs/id"}, "output": {"type": "string", "minLength": 1}}},
+        {"type": "object", "additionalProperties": false, "required": ["kind", "artifact_id"], "properties": {"kind": {"const": "artifact"}, "artifact_id": {"$ref": "#/$defs/id"}}},
+        {"type": "object", "additionalProperties": false, "required": ["kind", "template", "variables"], "properties": {"kind": {"const": "template"}, "template": {"type": "string"}, "variables": {"type": "object", "propertyNames": {"pattern": "^[A-Za-z][A-Za-z0-9_]*$"}, "additionalProperties": {"$ref": "#/$defs/id"}}}}
+      ]
+    },
+    "variable": {
+      "type": "object", "additionalProperties": false, "required": ["type", "default", "value", "modes", "bindings"],
+      "properties": {
+        "type": {"enum": ["string", "array", "number", "integer", "boolean", "object"]}, "default": {}, "value": {},
+        "description": {"type": "string"}, "separator": {"type": "string", "default": "\n"},
+        "modes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["keep", "override", "append"]}},
+        "bindings": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["node_id", "input"], "properties": {"node_id": {"$ref": "#/$defs/id"}, "input": {"type": "string", "minLength": 1}}}},
+        "items_schema": {"type": "object"}
+      }
+    },
+    "question": {
+      "type": "object", "additionalProperties": false, "required": ["id", "variable_id", "prompt", "modes"],
+      "properties": {"id": {"$ref": "#/$defs/id"}, "variable_id": {"$ref": "#/$defs/id"}, "prompt": {"type": "string"}, "modes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["keep", "override", "append"]}}}
+    },
+    "operation": {
+      "type": "object", "additionalProperties": false, "required": ["variable_id", "mode"],
+      "properties": {"variable_id": {"$ref": "#/$defs/id"}, "mode": {"enum": ["keep", "override", "append"]}, "value": {}},
+      "allOf": [{"if": {"properties": {"mode": {"const": "keep"}}}, "then": {"not": {"required": ["value"]}}, "else": {"required": ["value"]}}]
+    },
+    "execution": {
+      "type": "object", "additionalProperties": false, "required": ["kind", "tool", "version", "inputs", "params", "outputs"],
+      "properties": {
+        "kind": {"enum": ["mcp", "model", "script", "command", "manual"]}, "tool": {"type": "string", "minLength": 1},
+        "version": {"type": ["string", "null"]}, "model": {"type": ["string", "null"]},
+        "inputs": {"type": "object", "additionalProperties": {"$ref": "#/$defs/binding"}}, "params": {"type": "object"},
+        "outputs": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "runtime_ref": {"type": "string", "minLength": 1}, "argv": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "script_artifact_id": {"$ref": "#/$defs/id"}, "cwd": {"type": "string"}, "permissions": {"type": "object"}, "limits": {"type": "object"}
+      },
+      "allOf": [
+        {"if": {"properties": {"kind": {"enum": ["script", "command"]}}}, "then": {"required": ["runtime_ref", "argv"]}},
+        {"if": {"properties": {"kind": {"const": "script"}}}, "then": {"required": ["script_artifact_id"]}}
+      ]
+    },
+    "node": {
+      "type": "object", "additionalProperties": false, "required": ["id", "kind", "label", "branch_id", "provenance"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"}, "kind": {"enum": ["prompt", "decision", "tool", "model", "transform", "composition"]},
+        "label": {"type": "string"}, "branch_id": {"$ref": "#/$defs/id"}, "provenance": {"$ref": "#/$defs/provenance"},
+        "execution": {"$ref": "#/$defs/execution"}, "description": {"type": "string"}, "extensions": {"type": "object"}
+      }
+    },
+    "graph": {
+      "type": "object", "additionalProperties": false, "required": ["revision_id", "nodes", "edges", "branches", "golden_path"],
+      "properties": {
+        "revision_id": {"$ref": "#/$defs/id"}, "parent_revision_id": {"$ref": "#/$defs/nullable_id"},
+        "nodes": {"type": "array", "items": {"$ref": "#/$defs/node"}},
+        "edges": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["id", "source", "target", "kind"], "properties": {"id": {"$ref": "#/$defs/id"}, "source": {"$ref": "#/$defs/id"}, "target": {"$ref": "#/$defs/id"}, "kind": {"enum": ["data", "control"]}, "source_output": {"type": "string"}, "target_input": {"type": "string"}}}},
+        "branches": {"type": "array", "minItems": 1, "items": {"type": "object", "additionalProperties": false, "required": ["id", "parent_id", "state"], "properties": {"id": {"$ref": "#/$defs/id"}, "parent_id": {"$ref": "#/$defs/nullable_id"}, "state": {"enum": ["active", "dead_end", "hidden", "pruned"]}, "reason": {"type": "string"}}}},
+        "golden_path": {"$ref": "#/$defs/ids"}
+      }
+    },
+    "definition_snapshot": {
+      "type": "object", "additionalProperties": false,
+      "required": ["graph", "variables", "interactive_questions", "variable_operations"],
+      "properties": {
+        "graph": {"$ref": "#/$defs/graph"},
+        "variables": {"type": "object", "additionalProperties": {"$ref": "#/$defs/variable"}},
+        "interactive_questions": {"type": "array", "items": {"$ref": "#/$defs/question"}},
+        "variable_operations": {"type": "array", "items": {"$ref": "#/$defs/operation"}}
+      }
+    },
+    "artifact": {
+      "type": "object", "additionalProperties": false, "required": ["id", "uri", "mime_type", "sha256", "availability", "producer_node_id", "producer_run_id"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"}, "uri": {"type": "string", "minLength": 1}, "mime_type": {"type": "string", "minLength": 1},
+        "locations": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "sha256": {"oneOf": [{"type": "string", "pattern": "^[a-f0-9]{64}$"}, {"type": "null"}]},
+        "size": {"type": "integer", "minimum": 0}, "availability": {"enum": ["available", "unverified", "missing"]},
+        "producer_node_id": {"$ref": "#/$defs/nullable_id"}, "producer_run_id": {"$ref": "#/$defs/nullable_id"}, "preview_uri": {"type": "string"}, "license": {"type": "string"}, "attribution": {"type": "string"}
+      }
+    },
+    "harness": {
+      "type": "object", "additionalProperties": false, "required": ["id", "name", "version", "config", "state", "availability"],
+      "properties": {"id": {"$ref": "#/$defs/id"}, "name": {"type": "string", "minLength": 1}, "version": {"type": ["string", "null"]}, "config": {"type": "object"}, "state": {"type": "object"}, "availability": {"type": "object", "additionalProperties": {"enum": ["recorded", "missing", "redacted", "not_authorized"]}}, "artifact_ids": {"$ref": "#/$defs/ids"}}
+    },
+    "agent": {
+      "type": "object", "additionalProperties": false, "required": ["id", "session_id", "parent_agent_id", "harness_id", "client", "model"],
+      "properties": {"id": {"$ref": "#/$defs/id"}, "session_id": {"$ref": "#/$defs/id"}, "parent_agent_id": {"$ref": "#/$defs/nullable_id"}, "harness_id": {"$ref": "#/$defs/id"}, "client": {"type": "string"}, "model": {"type": "object"}, "spawned_by_event_id": {"$ref": "#/$defs/id"}}
+    },
+    "session": {
+      "type": "object", "additionalProperties": false, "required": ["id", "state", "consent", "created_at"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"}, "state": {"enum": ["active", "paused", "closed"]}, "created_at": {"$ref": "#/$defs/time"},
+        "consent": {"type": "object", "additionalProperties": false, "required": ["record", "include_children", "decided_at"], "properties": {"record": {"type": "boolean"}, "include_children": {"type": "boolean"}, "decided_at": {"$ref": "#/$defs/time"}}}
+      }
+    },
+    "run": {
+      "type": "object", "additionalProperties": false, "required": ["id", "trace_id", "node_id", "revision_id", "session_id", "agent_id", "harness_id", "state", "started_at", "inputs", "outputs", "artifact_ids", "provenance"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"}, "trace_id": {"$ref": "#/$defs/id"}, "node_id": {"$ref": "#/$defs/id"}, "revision_id": {"$ref": "#/$defs/id"}, "session_id": {"$ref": "#/$defs/id"}, "agent_id": {"$ref": "#/$defs/id"}, "harness_id": {"$ref": "#/$defs/id"},
+        "state": {"enum": ["running", "succeeded", "failed", "cancelled", "unknown"]}, "started_at": {"$ref": "#/$defs/time"}, "ended_at": {"$ref": "#/$defs/time"},
+        "inputs": {"type": "object"}, "outputs": {"type": "object"}, "artifact_ids": {"$ref": "#/$defs/ids"}, "error": {"type": "string"}, "duration_ms": {"type": "number", "minimum": 0}, "provenance": {"$ref": "#/$defs/provenance"},
+        "cache": {"type": "object", "additionalProperties": false, "properties": {"decision": {"enum": ["CACHE_HIT", "RECOMPUTE", "REBUILD", "unknown"]}, "input_hash": {"type": "string"}, "artifact_ids": {"$ref": "#/$defs/ids"}}},
+        "preview_stage": {"enum": ["draft", "final"]}
+      }
+    },
+    "history": {"type": "object", "additionalProperties": false, "required": ["kind", "artifact_id"], "properties": {"kind": {"enum": ["events", "revision", "log"]}, "artifact_id": {"$ref": "#/$defs/id"}, "revision_id": {"$ref": "#/$defs/id"}, "through_seq": {"type": "integer", "minimum": 0}}},
+    "snapshot": {
+      "type": "object", "additionalProperties": false, "required": ["stream_id", "snapshot_id", "commit_seq", "complete", "gaps"],
+      "properties": {"stream_id": {"$ref": "#/$defs/id"}, "snapshot_id": {"$ref": "#/$defs/id"}, "commit_seq": {"type": "integer", "minimum": 0}, "complete": {"type": "boolean"}, "gaps": {"type": "array", "items": {"type": "object"}}}
+    },
+    "event": {
+      "type": "object", "additionalProperties": false,
+      "required": ["event_id", "source_id", "source_seq", "session_id", "agent_id", "type", "timestamp", "causal_parents", "payload"],
+      "properties": {
+        "event_id": {"$ref": "#/$defs/id"}, "source_id": {"$ref": "#/$defs/id"}, "source_seq": {"type": "integer", "minimum": 1},
+        "session_id": {"$ref": "#/$defs/id"}, "agent_id": {"$ref": "#/$defs/nullable_id"},
+        "type": {"enum": ["session.created", "recorder.recovered", "harness.registered", "agent.registered", "definition.replaced", "variables.changed", "tool.started", "tool.finished", "artifact.recorded", "artifact.location_added", "message.recorded", "session.paused", "session.resumed", "session.closed", "note.recorded"]},
+        "timestamp": {"$ref": "#/$defs/time"}, "causal_parents": {"$ref": "#/$defs/ids"}, "payload": {"type": "object"}, "expected_revision": {"$ref": "#/$defs/id"}, "branch_id": {"$ref": "#/$defs/id"}
+      },
+      "allOf": [{"if": {"properties": {"type": {"enum": ["definition.replaced", "variables.changed"]}}}, "then": {"required": ["expected_revision", "branch_id"]}}]
+    }
+  }
+}

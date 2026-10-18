@@ -1,0 +1,115 @@
+{
+  "verification": {
+    "actual_image_tool_executed": true,
+    "analysis_id": "2eb9065b-f4ef-44d1-9a1c-05e5a9737796",
+    "api_equals_sqlite": true,
+    "automatic_hook": false,
+    "golden_path": [
+      "42e67291-d745-4c04-91b2-3892bc22dc1d"
+    ],
+    "idempotent_retry_equal": true,
+    "image_sha256": "eb999a2de4f331bc27e589903dbd54879d4e291aae5155caf27f649f6c16c9c5",
+    "import_id": "eacff730-32fe-4179-baad-a1aab63f3a46",
+    "mode": "real_mcp_real_image_real_deepseek",
+    "model": "deepseek-flash",
+    "original_archive_unchanged": true,
+    "project_id": "e8f95641-6347-4c91-b629-883a602c89a6",
+    "restart_readback_equal": true,
+    "sqlite_integrity": "ok",
+    "sqlite_row": {
+      "error_code": null,
+      "id": "2eb9065b-f4ef-44d1-9a1c-05e5a9737796",
+      "import_id": "eacff730-32fe-4179-baad-a1aab63f3a46",
+      "project_id": "e8f95641-6347-4c91-b629-883a602c89a6",
+      "request_id": "0517fef5-dc06-4c28-b5b1-7d980f35ae3e",
+      "state": "succeeded",
+      "subject": "live-image-user"
+    },
+    "steps": 1,
+    "table_counts": {
+      "imports": 1,
+      "projects": 1,
+      "receipts": 1,
+      "semantic_analyses": 1
+    },
+    "tested_at": "2026-10-17T01:49:23.125868Z",
+    "usage": {
+      "completion_tokens": 758,
+      "prompt_tokens": 3199,
+      "total_tokens": 3957
+    },
+    "variables": 2
+  },
+  "intent": {
+    "evidence_ids": [
+      "event:events-b4902b4f13682060cbdbee035971898df37895dd6a50cc43b5452cb32730ff2b:4",
+      "node:42e67291-d745-4c04-91b2-3892bc22dc1d"
+    ],
+    "provenance": "inferred",
+    "text": "用户希望基于已录制的真实工作流，生成一张黑猫宇航员站在月球、背景为地球的暖色水彩插画，并强调不得编造任何结果。"
+  },
+  "steps": [
+    {
+      "evidence_ids": [
+        "node:42e67291-d745-4c04-91b2-3892bc22dc1d"
+      ],
+      "node_id": "42e67291-d745-4c04-91b2-3892bc22dc1d",
+      "provenance": "inferred",
+      "text": "调用 image_gen.imagegen 工具，以字面量 prompt 与 transparent_background=false 生成一张方形水彩插画；该节点为手动执行，输出 image。",
+      "title": "生成黑猫宇航员水彩图"
+    }
+  ],
+  "variables": [
+    {
+      "allowed_modes": [
+        "keep",
+        "override",
+        "append"
+      ],
+      "evidence_ids": [
+        "node:42e67291-d745-4c04-91b2-3892bc22dc1d"
+      ],
+      "fact_id": "node:42e67291-d745-4c04-91b2-3892bc22dc1d",
+      "name": "prompt",
+      "pointer": "/execution/inputs/prompt",
+      "provenance": "inferred",
+      "text": "该节点的提示词以字面量方式绑定，可在执行输入中查看其当前值。",
+      "type": "string",
+      "value": "Use case: illustration-story\nAsset type: AiCA real workflow test image\nPrimary request: A black cat astronaut standing on the Moon, with Earth in the background.\nStyle/medium: warm watercolor illustration.\nComposition/framing: one square image, full cat visible.\nConstraints: no text, no logos, no watermark."
+    },
+    {
+      "allowed_modes": [
+        "keep",
+        "override"
+      ],
+      "evidence_ids": [
+        "node:42e67291-d745-4c04-91b2-3892bc22dc1d"
+      ],
+      "fact_id": "node:42e67291-d745-4c04-91b2-3892bc22dc1d",
+      "name": "transparent_background",
+      "pointer": "/execution/inputs/transparent_background",
+      "provenance": "inferred",
+      "text": "该节点的透明背景开关以字面量方式绑定，可在执行输入中查看其当前值。",
+      "type": "boolean",
+      "value": false
+    }
+  ],
+  "golden_path": {
+    "evidence_ids": [
+      "node:42e67291-d745-4c04-91b2-3892bc22dc1d",
+      "run:d456d4ee-7543-49df-a093-dc4bc5045f10",
+      "artifact:artifact-74001a79de666199848cfaf72442c27abe0085b1a32b54f8bd4d15282f6e8d0f"
+    ],
+    "node_ids": [
+      "42e67291-d745-4c04-91b2-3892bc22dc1d"
+    ],
+    "provenance": "inferred",
+    "text": "唯一成功节点为 image_gen.imagegen，其运行状态为 succeeded 并产出可用 PNG 工件，构成单节点闭合路径。"
+  },
+  "local_run_directory": "../AiCA-live-image-20261017T014707Z",
+  "source": "Direct read-only SQLite query after real MCP, image tool, HTTPS upload and DeepSeek call",
+  "review_notes": [
+    "测试题材与提示词由 Host 选择，用户要求是实际链路验证。模型意图将黑猫题材表述为用户希望，存在归因过度，保留原输出待审核。",
+    "生成工具由本次聊天真实调用，MCP 接收 Host 显式转交事件，不是自动监听。"
+  ]
+}

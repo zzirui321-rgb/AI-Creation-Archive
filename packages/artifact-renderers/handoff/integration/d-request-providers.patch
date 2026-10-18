@@ -1,0 +1,110 @@
+diff --git a/apps/gateway/src/aica_gateway/app.py b/apps/gateway/src/aica_gateway/app.py
+index 1216c02..5e0a09c 100644
+--- a/apps/gateway/src/aica_gateway/app.py
++++ b/apps/gateway/src/aica_gateway/app.py
+@@ -20,6 +20,7 @@ from fastapi.middleware.cors import CORSMiddleware
+ from fastapi.responses import FileResponse, JSONResponse
+ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+ from pydantic import BaseModel, ConfigDict, Field
++from preview.request_config import ImageConfig, configured_registry
+ from starlette.concurrency import run_in_threadpool
+ 
+ from .jobs import JobManager, fork_project
+@@ -48,6 +49,14 @@ class ExecutionBody(BaseModel):
+     stage: Literal["draft", "final"] = "draft"
+     record: bool
+     execute: bool
++    image_config: ImageConfig | None = None
++
++
++class PlanBody(BaseModel):
++    model_config = ConfigDict(extra="forbid", strict=True)
++    archive_id: str = Field(min_length=1, max_length=128)
++    stage: Literal["draft", "final"] = "draft"
++    image_config: ImageConfig | None = None
+ 
+ 
+ def create_app(data_dir=None, tokens=None, registry=None, cors_origins=None):
+@@ -244,12 +253,30 @@ def create_app(data_dir=None, tokens=None, registry=None, cors_origins=None):
+         return {"status": "success", "node_ids": golden_path(document, target_node_ids),
+                 "revision_id": document["graph"]["revision_id"], "method": "latest-successful-dependency-closure"}
+ 
++    @app.post("/api/projects/{project_id}/plan")
++    def configured_plan(project_id: str, body: PlanBody, user: str = Depends(principal)):
++        document = store.read_archive(user, project_id, body.archive_id)["archive"]
++        try:
++            selected_registry = configured_registry(body.image_config, registry)
++        except ValueError:
++            raise HTTPException(422, "Invalid image provider configuration") from None
++        return replay_plan(document, selected_registry, lambda key: store.cache_get(project_id, key),
++                           lambda sha256: store.read_blob(project_id, sha256), body.stage)
++
+     @app.post("/api/projects/{project_id}/executions", status_code=202)
+     def execute(project_id: str, body: ExecutionBody, user: str = Depends(principal)):
+         require(body.record is True and body.execute is True, "Execution and recording require explicit consent",
+                 "not_authorized")
+         require(manager is not None, "Gateway lifecycle has not started", "service_unavailable")
+-        result = manager.submit(user, project_id, body.model_dump())
++        try:
++            selected_registry = configured_registry(body.image_config, registry)
++            identity = body.image_config.public_identity() if body.image_config else None
++        except ValueError:
++            raise HTTPException(422, "Invalid image provider configuration") from None
++        payload = body.model_dump(exclude={"image_config"})
++        if identity:
++            payload["provider_identity"] = identity
++        result = manager.submit(user, project_id, payload, registry=selected_registry)
+         return result
+ 
+     @app.get("/api/projects/{project_id}/executions")
+diff --git a/apps/gateway/src/aica_gateway/jobs.py b/apps/gateway/src/aica_gateway/jobs.py
+index 2d723b4..2cdf8ff 100644
+--- a/apps/gateway/src/aica_gateway/jobs.py
++++ b/apps/gateway/src/aica_gateway/jobs.py
+@@ -47,7 +47,8 @@ class JobManager:
+             self.store.set_job_state(row["id"], "unknown", {"status": "error", "code": "server_restarted",
+                                                            "message": "Execution interrupted; no automatic replay"})
+ 
+-    def submit(self, owner, project_id, payload):
++    def submit(self, owner, project_id, payload, registry=None):
++        registry = registry or self.registry
+         with self.store.transaction() as database:
+             self.store.project(database, project_id, owner)
+             previous = self.store.previous_action(database, project_id, "execution", payload["request_id"], digest(payload))
+@@ -56,19 +57,19 @@ class JobManager:
+         archive = self.store.read_archive(owner, project_id, payload["archive_id"])["archive"]
+         require(archive["graph"]["revision_id"] == payload["expected_revision"],
+                 "Workflow revision changed", "revision_conflict")
+-        plan = execution_plan(archive, self.registry, payload.get("target_node_ids"))
++        plan = execution_plan(archive, registry, payload.get("target_node_ids"))
+         if not plan["executable"]:
+             raise ProtocolError("Execution preflight failed", "execution_blocked", plan["blockers"])
+         result, created = self.store.create_job(owner, project_id, payload)
+         if created:
+-            self.pool.submit(self.execute, owner, project_id, result["job_id"], payload, archive)
++            self.pool.submit(self.execute, owner, project_id, result["job_id"], payload, archive, registry)
+         return result
+ 
+-    def execute(self, owner, project_id, job_id, payload, archive):
++    def execute(self, owner, project_id, job_id, payload, archive, registry=None):
+         self.store.set_job_state(job_id, "running")
+         try:
+             workspace = self.store.prepare_workspace(project_id, job_id, archive)
+-            engine = RuntimeEngine(self.registry,
++            engine = RuntimeEngine(registry or self.registry,
+                                    lambda key: self.store.cache_get(project_id, key),
+                                    lambda key, value: self.store.cache_put(project_id, key, value),
+                                    lambda sha256: self.store.read_blob(project_id, sha256),
+diff --git a/packages/runtime/src/aica_runtime/engine.py b/packages/runtime/src/aica_runtime/engine.py
+index 4399f06..4ed3f6a 100644
+--- a/packages/runtime/src/aica_runtime/engine.py
++++ b/packages/runtime/src/aica_runtime/engine.py
+@@ -214,7 +214,7 @@ class RuntimeEngine:
+             finish["error"] = error_message
+         self.emit("tool.finished", finish)
+         published = self.publish()
+-        if state == "succeeded" and tool["cacheable"]:
++        if state == "succeeded" and tool["cacheable"] and getattr(context, "cache_allowed", True):
+             available = {item["id"]: item for item in published["artifacts"]}
+             referenced = {item["id"] for item in context.artifacts}
+ 

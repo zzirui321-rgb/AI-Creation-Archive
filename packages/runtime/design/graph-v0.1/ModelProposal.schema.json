@@ -1,0 +1,567 @@
+{
+  "$defs": {
+    "DependencyProposal": {
+      "additionalProperties": false,
+      "properties": {
+        "source_key": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Source Key",
+          "type": "string"
+        },
+        "target_key": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Target Key",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "data",
+            "control"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "explanation": {
+          "$ref": "#/$defs/ProposalClaim"
+        }
+      },
+      "required": [
+        "source_key",
+        "target_key",
+        "kind",
+        "explanation"
+      ],
+      "title": "DependencyProposal",
+      "type": "object"
+    },
+    "GroupProposal": {
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Key",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "intent",
+            "decision",
+            "generation",
+            "transform",
+            "composition",
+            "other"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "label": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "source_node_ids": {
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+            "type": "string"
+          },
+          "maxItems": 1000,
+          "title": "Source Node Ids",
+          "type": "array"
+        },
+        "purpose": {
+          "$ref": "#/$defs/ProposalClaim"
+        },
+        "requirements": {
+          "items": {
+            "$ref": "#/$defs/ProposalClaim"
+          },
+          "maxItems": 50,
+          "title": "Requirements",
+          "type": "array"
+        },
+        "evidence_ids": {
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+            "type": "string"
+          },
+          "maxItems": 1000,
+          "minItems": 1,
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "prompt_ids": {
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+            "type": "string"
+          },
+          "maxItems": 1000,
+          "title": "Prompt Ids",
+          "type": "array"
+        },
+        "prompts": {
+          "items": {
+            "$ref": "#/$defs/PromptProposal"
+          },
+          "maxItems": 8,
+          "title": "Prompts",
+          "type": "array"
+        },
+        "pages": {
+          "items": {
+            "$ref": "#/$defs/PageProposal"
+          },
+          "maxItems": 200,
+          "title": "Pages",
+          "type": "array"
+        }
+      },
+      "required": [
+        "key",
+        "kind",
+        "label",
+        "source_node_ids",
+        "purpose",
+        "requirements",
+        "evidence_ids"
+      ],
+      "title": "GroupProposal",
+      "type": "object"
+    },
+    "Issue": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "code": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Code",
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "warning",
+            "error"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "message": {
+          "maxLength": 3000,
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        },
+        "node_ids": {
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+            "type": "string"
+          },
+          "maxItems": 1000,
+          "title": "Node Ids",
+          "type": "array"
+        },
+        "evidence_ids": {
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+            "type": "string"
+          },
+          "maxItems": 1000,
+          "title": "Evidence Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "code",
+        "severity",
+        "message",
+        "node_ids",
+        "evidence_ids"
+      ],
+      "title": "Issue",
+      "type": "object"
+    },
+    "PagePromptProposal": {
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "consolidated",
+            "suggested"
+          ],
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text",
+        "kind"
+      ],
+      "title": "PagePromptProposal",
+      "type": "object"
+    },
+    "PageProposal": {
+      "additionalProperties": false,
+      "properties": {
+        "source_page_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Source Page Id",
+          "type": "string"
+        },
+        "summary": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Summary",
+          "type": "string"
+        },
+        "prompts": {
+          "items": {
+            "$ref": "#/$defs/PagePromptProposal"
+          },
+          "maxItems": 3,
+          "title": "Prompts",
+          "type": "array"
+        }
+      },
+      "required": [
+        "source_page_id",
+        "summary"
+      ],
+      "title": "PageProposal",
+      "type": "object"
+    },
+    "PromptProposal": {
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "maxLength": 6000,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "consolidated",
+            "suggested"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "evidence_ids": {
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+            "type": "string"
+          },
+          "maxItems": 1000,
+          "minItems": 1,
+          "title": "Evidence Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "text",
+        "kind",
+        "evidence_ids"
+      ],
+      "title": "PromptProposal",
+      "type": "object"
+    },
+    "ProposalClaim": {
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "maxLength": 3000,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "attributed_to": {
+          "enum": [
+            "user",
+            "agent",
+            "tool",
+            "analyst",
+            "unknown"
+          ],
+          "title": "Attributed To",
+          "type": "string"
+        },
+        "actor_id": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Actor Id"
+        },
+        "speech_act": {
+          "enum": [
+            "request",
+            "proposal",
+            "observation",
+            "interpretation"
+          ],
+          "title": "Speech Act",
+          "type": "string"
+        },
+        "evidence_ids": {
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+            "type": "string"
+          },
+          "maxItems": 1000,
+          "minItems": 1,
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "origin": {
+          "const": "llm",
+          "title": "Origin",
+          "type": "string"
+        },
+        "review": {
+          "const": "candidate",
+          "title": "Review",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text",
+        "attributed_to",
+        "actor_id",
+        "speech_act",
+        "evidence_ids",
+        "origin",
+        "review"
+      ],
+      "title": "ProposalClaim",
+      "type": "object"
+    },
+    "SemanticProposal": {
+      "additionalProperties": false,
+      "properties": {
+        "source_key": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Source Key",
+          "type": "string"
+        },
+        "target_key": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Target Key",
+          "type": "string"
+        },
+        "kind": {
+          "const": "semantic",
+          "title": "Kind",
+          "type": "string"
+        },
+        "relation": {
+          "enum": [
+            "refines",
+            "alternative_to",
+            "continues",
+            "inspired_by",
+            "supports"
+          ],
+          "title": "Relation",
+          "type": "string"
+        },
+        "explanation": {
+          "$ref": "#/$defs/ProposalClaim"
+        }
+      },
+      "required": [
+        "source_key",
+        "target_key",
+        "kind",
+        "relation",
+        "explanation"
+      ],
+      "title": "SemanticProposal",
+      "type": "object"
+    },
+    "ValueLocator": {
+      "additionalProperties": false,
+      "properties": {
+        "source_node_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Source Node Id",
+          "type": "string"
+        },
+        "evidence_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "pointer": {
+          "pattern": "^/",
+          "title": "Pointer",
+          "type": "string"
+        },
+        "decode": {
+          "enum": [
+            "identity",
+            "json_string"
+          ],
+          "title": "Decode",
+          "type": "string"
+        },
+        "value_pointer": {
+          "title": "Value Pointer",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_node_id",
+        "evidence_id",
+        "pointer",
+        "decode",
+        "value_pointer"
+      ],
+      "title": "ValueLocator",
+      "type": "object"
+    },
+    "VariableProposal": {
+      "additionalProperties": false,
+      "properties": {
+        "group_key": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Group Key",
+          "type": "string"
+        },
+        "label": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "locator": {
+          "$ref": "#/$defs/ValueLocator"
+        },
+        "description": {
+          "$ref": "#/$defs/ProposalClaim"
+        }
+      },
+      "required": [
+        "group_key",
+        "label",
+        "locator",
+        "description"
+      ],
+      "title": "VariableProposal",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "groups": {
+      "items": {
+        "$ref": "#/$defs/GroupProposal"
+      },
+      "maxItems": 200,
+      "title": "Groups",
+      "type": "array"
+    },
+    "edges": {
+      "items": {
+        "discriminator": {
+          "mapping": {
+            "control": "#/$defs/DependencyProposal",
+            "data": "#/$defs/DependencyProposal",
+            "semantic": "#/$defs/SemanticProposal"
+          },
+          "propertyName": "kind"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/$defs/DependencyProposal"
+          },
+          {
+            "$ref": "#/$defs/SemanticProposal"
+          }
+        ]
+      },
+      "maxItems": 1000,
+      "title": "Edges",
+      "type": "array"
+    },
+    "variables": {
+      "items": {
+        "$ref": "#/$defs/VariableProposal"
+      },
+      "maxItems": 200,
+      "title": "Variables",
+      "type": "array"
+    },
+    "unresolved": {
+      "items": {
+        "$ref": "#/$defs/Issue"
+      },
+      "maxItems": 1000,
+      "title": "Unresolved",
+      "type": "array"
+    }
+  },
+  "required": [
+    "groups",
+    "edges",
+    "variables",
+    "unresolved"
+  ],
+  "title": "ModelProposal",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:aica:semantic-design:0.1:ModelProposal"
+}

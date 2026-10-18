@@ -1,0 +1,458 @@
+{
+  "actual_creation_tools_executed": false,
+  "mode": "real_model_on_synthetic_facts",
+  "report": {
+    "analysis": {
+      "dependencies": [
+        {
+          "confidence": "medium",
+          "evidence_ids": [
+            "node:a3f54eba-3f07-499d-8bd1-550add3d0750",
+            "node:8e37d404-cca9-499a-beef-b7aad243c568"
+          ],
+          "kind": "data",
+          "provenance": "inferred",
+          "source": "a3f54eba-3f07-499d-8bd1-550add3d0750",
+          "target": "8e37d404-cca9-499a-beef-b7aad243c568",
+          "text": "comic.panel 的输入参数 reference_image 取值为 character.png，与 image.generate 的输出文件名 character.png 一致，推断分镜绘制在数据上依赖角色图产物。"
+        },
+        {
+          "confidence": "medium",
+          "evidence_ids": [
+            "node:c69c0bd8-68e1-4956-bea5-778d821bda95",
+            "node:a3f54eba-3f07-499d-8bd1-550add3d0750",
+            "node:8e37d404-cca9-499a-beef-b7aad243c568"
+          ],
+          "kind": "semantic",
+          "provenance": "inferred",
+          "source": "a3f54eba-3f07-499d-8bd1-550add3d0750",
+          "target": "8e37d404-cca9-499a-beef-b7aad243c568",
+          "text": "用户意图明确要求先出角色图再以其为参考画分镜，且 comic.panel 的 prompt 强调「同一只黑猫」，推断分镜步骤在语义上依赖角色图步骤以保持角色一致。"
+        },
+        {
+          "confidence": "low",
+          "evidence_ids": [
+            "node:c69c0bd8-68e1-4956-bea5-778d821bda95",
+            "node:a3f54eba-3f07-499d-8bd1-550add3d0750",
+            "node:8e37d404-cca9-499a-beef-b7aad243c568"
+          ],
+          "kind": "control",
+          "provenance": "inferred",
+          "source": "a3f54eba-3f07-499d-8bd1-550add3d0750",
+          "target": "8e37d404-cca9-499a-beef-b7aad243c568",
+          "text": "用户消息先描述生成角色图、再描述绘制分镜，构成先后顺序的流程控制意图，推断角色图节点在控制流上先于分镜节点。"
+        }
+      ],
+      "golden_path": {
+        "evidence_ids": [
+          "node:c69c0bd8-68e1-4956-bea5-778d821bda95",
+          "node:a3f54eba-3f07-499d-8bd1-550add3d0750",
+          "node:8e37d404-cca9-499a-beef-b7aad243c568"
+        ],
+        "node_ids": [],
+        "provenance": "inferred",
+        "text": "没有成功执行证据（latest_successful_node_ids 为空），无法给出可确认的成功路径；仅能依据用户意图与节点输入推断理想顺序为：先 image.generate 生成角色图，再 comic.panel 以其为参考绘制分镜。"
+      },
+      "intent": {
+        "evidence_ids": [
+          "node:c69c0bd8-68e1-4956-bea5-778d821bda95",
+          "node:a3f54eba-3f07-499d-8bd1-550add3d0750",
+          "node:8e37d404-cca9-499a-beef-b7aad243c568"
+        ],
+        "provenance": "inferred",
+        "text": "用户希望制作一页漫画：先用 image.generate 生成黑猫宇航员角色图（character.png），再以该图为参考用 comic.panel 绘制月球分镜（panel.png），并保持角色一致。"
+      },
+      "questions": [
+        {
+          "evidence_ids": [
+            "node:a3f54eba-3f07-499d-8bd1-550add3d0750",
+            "node:8e37d404-cca9-499a-beef-b7aad243c568"
+          ],
+          "provenance": "inferred",
+          "text": "latest_successful_node_ids 为空，缺少成功执行证据，无法确认哪些节点真正成功运行；extensions.aica.observed_result 中的 character.png 与 panel.png 是否代表成功产物仍需确认。"
+        },
+        {
+          "evidence_ids": [
+            "node:a3f54eba-3f07-499d-8bd1-550add3d0750",
+            "node:8e37d404-cca9-499a-beef-b7aad243c568"
+          ],
+          "provenance": "inferred",
+          "text": "comic.panel 的 reference_image 与 image.generate 的 output 同为 character.png，但缺少显式数据绑定声明，二者是否确为同一产物引用需确认。"
+        },
+        {
+          "evidence_ids": [
+            "node:a3f54eba-3f07-499d-8bd1-550add3d0750",
+            "node:8e37d404-cca9-499a-beef-b7aad243c568"
+          ],
+          "provenance": "inferred",
+          "text": "两个工具节点的 execution.params 均为空，是否存在未记录的可调参数（如风格、尺寸、分镜布局）需确认。"
+        }
+      ],
+      "steps": [
+        {
+          "evidence_ids": [
+            "node:c69c0bd8-68e1-4956-bea5-778d821bda95"
+          ],
+          "node_id": "c69c0bd8-68e1-4956-bea5-778d821bda95",
+          "provenance": "inferred",
+          "text": "用户以自然语言提出创作目标：制作一页漫画，先生成黑猫宇航员角色图，再以该图为参考绘制月球分镜并保持角色一致。该节点是整条流程的意图来源。",
+          "title": "提出漫画创作意图"
+        },
+        {
+          "evidence_ids": [
+            "node:a3f54eba-3f07-499d-8bd1-550add3d0750"
+          ],
+          "node_id": "a3f54eba-3f07-499d-8bd1-550add3d0750",
+          "provenance": "inferred",
+          "text": "调用 image.generate 工具，输入 prompt「黑猫宇航员，水彩风格」、seed 42、输出 character.png，用于生成角色参考图。",
+          "title": "生成黑猫宇航员角色图"
+        },
+        {
+          "evidence_ids": [
+            "node:8e37d404-cca9-499a-beef-b7aad243c568"
+          ],
+          "node_id": "8e37d404-cca9-499a-beef-b7aad243c568",
+          "provenance": "inferred",
+          "text": "调用 comic.panel 工具，输入 prompt「同一只黑猫在月球行走」、reference_image 指向 character.png、输出 panel.png，用于在保持角色一致的前提下绘制月球分镜。",
+          "title": "绘制月球分镜"
+        }
+      ],
+      "variables": [
+        {
+          "allowed_modes": [
+            "keep",
+            "override",
+            "append"
+          ],
+          "evidence_ids": [
+            "node:a3f54eba-3f07-499d-8bd1-550add3d0750"
+          ],
+          "fact_id": "node:a3f54eba-3f07-499d-8bd1-550add3d0750",
+          "name": "character_prompt",
+          "pointer": "/execution/inputs/arguments/prompt",
+          "provenance": "inferred",
+          "text": "image.generate 的输入参数 prompt，当前值为「黑猫宇航员，水彩风格」，可作为可开放参数调整角色描述。",
+          "type": "string",
+          "value": "黑猫宇航员，水彩风格"
+        },
+        {
+          "allowed_modes": [
+            "keep",
+            "override"
+          ],
+          "evidence_ids": [
+            "node:a3f54eba-3f07-499d-8bd1-550add3d0750"
+          ],
+          "fact_id": "node:a3f54eba-3f07-499d-8bd1-550add3d0750",
+          "name": "character_seed",
+          "pointer": "/execution/inputs/arguments/seed",
+          "provenance": "inferred",
+          "text": "image.generate 的输入参数 seed，当前值为 42，可用于复现或变更角色图随机性。",
+          "type": "integer",
+          "value": 42
+        },
+        {
+          "allowed_modes": [
+            "keep",
+            "override",
+            "append"
+          ],
+          "evidence_ids": [
+            "node:a3f54eba-3f07-499d-8bd1-550add3d0750"
+          ],
+          "fact_id": "node:a3f54eba-3f07-499d-8bd1-550add3d0750",
+          "name": "character_output",
+          "pointer": "/execution/inputs/arguments/output",
+          "provenance": "inferred",
+          "text": "image.generate 的输入参数 output，当前值为 character.png，决定角色图产物文件名。",
+          "type": "string",
+          "value": "character.png"
+        },
+        {
+          "allowed_modes": [
+            "keep",
+            "override",
+            "append"
+          ],
+          "evidence_ids": [
+            "node:8e37d404-cca9-499a-beef-b7aad243c568"
+          ],
+          "fact_id": "node:8e37d404-cca9-499a-beef-b7aad243c568",
+          "name": "panel_prompt",
+          "pointer": "/execution/inputs/arguments/prompt",
+          "provenance": "inferred",
+          "text": "comic.panel 的输入参数 prompt，当前值为「同一只黑猫在月球行走」，可作为可开放参数调整分镜画面描述。",
+          "type": "string",
+          "value": "同一只黑猫在月球行走"
+        },
+        {
+          "allowed_modes": [
+            "keep",
+            "override",
+            "append"
+          ],
+          "evidence_ids": [
+            "node:8e37d404-cca9-499a-beef-b7aad243c568"
+          ],
+          "fact_id": "node:8e37d404-cca9-499a-beef-b7aad243c568",
+          "name": "panel_reference_image",
+          "pointer": "/execution/inputs/arguments/reference_image",
+          "provenance": "inferred",
+          "text": "comic.panel 的输入参数 reference_image，当前值为 character.png，指向角色参考图，是保持角色一致的关键参数。",
+          "type": "string",
+          "value": "character.png"
+        },
+        {
+          "allowed_modes": [
+            "keep",
+            "override",
+            "append"
+          ],
+          "evidence_ids": [
+            "node:8e37d404-cca9-499a-beef-b7aad243c568"
+          ],
+          "fact_id": "node:8e37d404-cca9-499a-beef-b7aad243c568",
+          "name": "panel_output",
+          "pointer": "/execution/inputs/arguments/output",
+          "provenance": "inferred",
+          "text": "comic.panel 的输入参数 output，当前值为 panel.png，决定分镜产物文件名。",
+          "type": "string",
+          "value": "panel.png"
+        }
+      ]
+    },
+    "coverage": {
+      "history_files": 0,
+      "recording_complete": true,
+      "selected_nodes": 3,
+      "total_nodes": 3,
+      "warnings": []
+    },
+    "declared_dependencies": [],
+    "engine": {
+      "model": "deepseek-flash",
+      "prompt_version": "aica-semantics/0.1",
+      "provider": "deepseek",
+      "thinking": "disabled"
+    },
+    "evidence": [
+      {
+        "id": "node:c69c0bd8-68e1-4956-bea5-778d821bda95",
+        "node_ids": [
+          "c69c0bd8-68e1-4956-bea5-778d821bda95"
+        ],
+        "original_digest": "1e44a4ae114be81068ddcf70017624549feea2b5fba27c9a7bc77902940e9d02",
+        "source": {
+          "kind": "archive",
+          "normalization": "literal-inputs-and-JSON-arguments",
+          "pointer": "/graph/nodes/0"
+        },
+        "value": {
+          "branch_id": "main",
+          "branch_state": "active",
+          "description": "制作一页漫画：先生成黑猫宇航员角色图，再以这张图为参考绘制月球分镜，保持角色一致。",
+          "id": "c69c0bd8-68e1-4956-bea5-778d821bda95",
+          "kind": "prompt",
+          "label": "Conversation message",
+          "provenance": {
+            "evidence": [
+              {
+                "artifact_id": "source-log",
+                "line": 1,
+                "source": "trace.jsonl"
+              }
+            ],
+            "missing": [
+              "original_environment",
+              "complete_harness_state"
+            ],
+            "mode": "extracted"
+          }
+        }
+      },
+      {
+        "id": "node:a3f54eba-3f07-499d-8bd1-550add3d0750",
+        "node_ids": [
+          "a3f54eba-3f07-499d-8bd1-550add3d0750"
+        ],
+        "original_digest": "214701ee3a9e87797dc2524e7b6061e77a32e9495968b76a38ad9fe0bba83b3c",
+        "source": {
+          "kind": "archive",
+          "normalization": "literal-inputs-and-JSON-arguments",
+          "pointer": "/graph/nodes/1"
+        },
+        "value": {
+          "branch_id": "main",
+          "branch_state": "active",
+          "description": "",
+          "execution": {
+            "input_bindings": {
+              "arguments": {
+                "kind": "literal",
+                "value": {
+                  "output": "character.png",
+                  "prompt": "黑猫宇航员，水彩风格",
+                  "seed": 42
+                }
+              }
+            },
+            "inputs": {
+              "arguments": {
+                "output": "character.png",
+                "prompt": "黑猫宇航员，水彩风格",
+                "seed": 42
+              }
+            },
+            "kind": "manual",
+            "outputs": [
+              "result"
+            ],
+            "params": {},
+            "tool": "image.generate",
+            "version": null
+          },
+          "extensions": {
+            "aica.observed_result": {
+              "path": "character.png"
+            }
+          },
+          "id": "a3f54eba-3f07-499d-8bd1-550add3d0750",
+          "kind": "tool",
+          "label": "image.generate",
+          "provenance": {
+            "evidence": [
+              {
+                "artifact_id": "source-log",
+                "line": 2,
+                "source": "trace.jsonl"
+              },
+              {
+                "artifact_id": "source-log",
+                "line": 3,
+                "source": "trace.jsonl"
+              }
+            ],
+            "missing": [
+              "original_environment",
+              "complete_harness_state"
+            ],
+            "mode": "extracted"
+          }
+        }
+      },
+      {
+        "id": "node:8e37d404-cca9-499a-beef-b7aad243c568",
+        "node_ids": [
+          "8e37d404-cca9-499a-beef-b7aad243c568"
+        ],
+        "original_digest": "b68d49b4893bd4a287e11a9518c8ef1b7b08bf959d3436088b66694c2e0ab01d",
+        "source": {
+          "kind": "archive",
+          "normalization": "literal-inputs-and-JSON-arguments",
+          "pointer": "/graph/nodes/2"
+        },
+        "value": {
+          "branch_id": "main",
+          "branch_state": "active",
+          "description": "",
+          "execution": {
+            "input_bindings": {
+              "arguments": {
+                "kind": "literal",
+                "value": {
+                  "output": "panel.png",
+                  "prompt": "同一只黑猫在月球行走",
+                  "reference_image": "character.png"
+                }
+              }
+            },
+            "inputs": {
+              "arguments": {
+                "output": "panel.png",
+                "prompt": "同一只黑猫在月球行走",
+                "reference_image": "character.png"
+              }
+            },
+            "kind": "manual",
+            "outputs": [
+              "result"
+            ],
+            "params": {},
+            "tool": "comic.panel",
+            "version": null
+          },
+          "extensions": {
+            "aica.observed_result": {
+              "path": "panel.png"
+            }
+          },
+          "id": "8e37d404-cca9-499a-beef-b7aad243c568",
+          "kind": "tool",
+          "label": "comic.panel",
+          "provenance": {
+            "evidence": [
+              {
+                "artifact_id": "source-log",
+                "line": 4,
+                "source": "trace.jsonl"
+              },
+              {
+                "artifact_id": "source-log",
+                "line": 5,
+                "source": "trace.jsonl"
+              }
+            ],
+            "missing": [
+              "original_environment",
+              "complete_harness_state"
+            ],
+            "mode": "extracted"
+          }
+        }
+      },
+      {
+        "id": "variables",
+        "node_ids": [],
+        "original_digest": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "source": {
+          "kind": "archive",
+          "pointer": "/variables"
+        },
+        "value": {}
+      },
+      {
+        "id": "snapshot",
+        "node_ids": [],
+        "original_digest": "b4de5d94dd9bfa063dd39ddd464eb614b050a6fd0081a9e2b29e4a8ad895cb05",
+        "source": {
+          "kind": "archive",
+          "pointer": "/snapshot"
+        },
+        "value": {
+          "commit_seq": 0,
+          "complete": true,
+          "gaps": [],
+          "snapshot_id": "84849248-2762-4b98-8728-5c5b30c0efc3",
+          "stream_id": "aade9ff1-d74b-4b1a-8e2c-d56294d1f120"
+        }
+      }
+    ],
+    "executable": false,
+    "format": "aica-semantic-report/0.1",
+    "input_sha256": "e07ab0ce108f37b5d776bcf297e1750e8dc3aea7a3cc31f7dad9965ef69b60b8",
+    "requires_review": true,
+    "source": {
+      "archive_sha256": "9971414b2ebf79aaf8212a0ee55742364ecd151bdd1e2c12338e055140020a34",
+      "import_id": "fbc34e50-374e-48f7-a718-58ea9725055d",
+      "revision_id": "35a7cab2-6849-4ae7-abc0-42f5a41e0a7b"
+    },
+    "state": "draft",
+    "uncovered_node_ids": [],
+    "usage": {
+      "completion_tokens": 2022,
+      "prompt_tokens": 2631,
+      "total_tokens": 4653
+    }
+  },
+  "tested_at": "2026-10-17T01:33:14.673502+00:00"
+}

@@ -1,0 +1,1060 @@
+{
+  "$defs": {
+    "Claim": {
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "maxLength": 3000,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "attributed_to": {
+          "enum": [
+            "user",
+            "agent",
+            "tool",
+            "analyst",
+            "unknown"
+          ],
+          "title": "Attributed To",
+          "type": "string"
+        },
+        "actor_id": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Actor Id"
+        },
+        "speech_act": {
+          "enum": [
+            "request",
+            "proposal",
+            "observation",
+            "interpretation"
+          ],
+          "title": "Speech Act",
+          "type": "string"
+        },
+        "evidence_ids": {
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+            "type": "string"
+          },
+          "maxItems": 1000,
+          "minItems": 1,
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "origin": {
+          "enum": [
+            "rule",
+            "llm",
+            "human"
+          ],
+          "title": "Origin",
+          "type": "string"
+        },
+        "review": {
+          "enum": [
+            "candidate",
+            "accepted",
+            "rejected"
+          ],
+          "title": "Review",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text",
+        "attributed_to",
+        "actor_id",
+        "speech_act",
+        "evidence_ids",
+        "origin",
+        "review"
+      ],
+      "title": "Claim",
+      "type": "object"
+    },
+    "ClaimEdit": {
+      "additionalProperties": false,
+      "properties": {
+        "op": {
+          "const": "replace_purpose",
+          "title": "Op",
+          "type": "string"
+        },
+        "node_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Node Id",
+          "type": "string"
+        },
+        "value": {
+          "$ref": "#/$defs/Claim"
+        }
+      },
+      "required": [
+        "op",
+        "node_id",
+        "value"
+      ],
+      "title": "ClaimEdit",
+      "type": "object"
+    },
+    "ControlEdge": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "control",
+          "title": "Kind",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "source": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Source",
+          "type": "string"
+        },
+        "target": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Target",
+          "type": "string"
+        },
+        "state": {
+          "enum": [
+            "candidate",
+            "verified"
+          ],
+          "title": "State",
+          "type": "string"
+        },
+        "archive_edge_id": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Archive Edge Id"
+        },
+        "explanation": {
+          "$ref": "#/$defs/Claim"
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "source",
+        "target",
+        "state",
+        "archive_edge_id",
+        "explanation"
+      ],
+      "title": "ControlEdge",
+      "type": "object"
+    },
+    "DataBinding": {
+      "additionalProperties": false,
+      "properties": {
+        "source_node_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Source Node Id",
+          "type": "string"
+        },
+        "source_output": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Source Output",
+          "type": "string"
+        },
+        "target_node_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Target Node Id",
+          "type": "string"
+        },
+        "target_input": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Target Input",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_node_id",
+        "source_output",
+        "target_node_id",
+        "target_input"
+      ],
+      "title": "DataBinding",
+      "type": "object"
+    },
+    "DataEdge": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "data",
+          "title": "Kind",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "source": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Source",
+          "type": "string"
+        },
+        "target": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Target",
+          "type": "string"
+        },
+        "state": {
+          "enum": [
+            "candidate",
+            "verified"
+          ],
+          "title": "State",
+          "type": "string"
+        },
+        "archive_edge_id": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Archive Edge Id"
+        },
+        "binding": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DataBinding"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "explanation": {
+          "$ref": "#/$defs/Claim"
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "source",
+        "target",
+        "state",
+        "archive_edge_id",
+        "binding",
+        "explanation"
+      ],
+      "title": "DataEdge",
+      "type": "object"
+    },
+    "DeleteEdge": {
+      "additionalProperties": false,
+      "properties": {
+        "op": {
+          "const": "delete_edge",
+          "title": "Op",
+          "type": "string"
+        },
+        "edge_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Edge Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "op",
+        "edge_id"
+      ],
+      "title": "DeleteEdge",
+      "type": "object"
+    },
+    "EdgeEdit": {
+      "additionalProperties": false,
+      "properties": {
+        "op": {
+          "const": "upsert_edge",
+          "title": "Op",
+          "type": "string"
+        },
+        "value": {
+          "discriminator": {
+            "mapping": {
+              "control": "#/$defs/ControlEdge",
+              "data": "#/$defs/DataEdge",
+              "semantic": "#/$defs/SemanticEdge"
+            },
+            "propertyName": "kind"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/DataEdge"
+            },
+            {
+              "$ref": "#/$defs/ControlEdge"
+            },
+            {
+              "$ref": "#/$defs/SemanticEdge"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "op",
+        "value"
+      ],
+      "title": "EdgeEdit",
+      "type": "object"
+    },
+    "JsonValue": {},
+    "LabelEdit": {
+      "additionalProperties": false,
+      "properties": {
+        "op": {
+          "const": "set_label",
+          "title": "Op",
+          "type": "string"
+        },
+        "node_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Node Id",
+          "type": "string"
+        },
+        "value": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "op",
+        "node_id",
+        "value"
+      ],
+      "title": "LabelEdit",
+      "type": "object"
+    },
+    "ModuleImageEdit": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "original_artifact_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Original Artifact Id",
+          "type": "string"
+        },
+        "result_artifact_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Result Artifact Id",
+          "type": "string"
+        },
+        "instruction": {
+          "maxLength": 4000,
+          "minLength": 1,
+          "title": "Instruction",
+          "type": "string"
+        },
+        "region": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Region"
+        },
+        "model": {
+          "title": "Model",
+          "type": "string"
+        },
+        "source": {
+          "title": "Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "original_artifact_id",
+        "result_artifact_id",
+        "instruction",
+        "model",
+        "source"
+      ],
+      "title": "ModuleImageEdit",
+      "type": "object"
+    },
+    "ModulePage": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "label": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "page_number": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Page Number"
+        },
+        "summary": {
+          "$ref": "#/$defs/Claim"
+        },
+        "prompts": {
+          "items": {
+            "$ref": "#/$defs/ModulePrompt"
+          },
+          "maxItems": 200,
+          "title": "Prompts",
+          "type": "array"
+        },
+        "artifact_ids": {
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+            "type": "string"
+          },
+          "maxItems": 1000,
+          "title": "Artifact Ids",
+          "type": "array"
+        },
+        "evidence_ids": {
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+            "type": "string"
+          },
+          "maxItems": 1000,
+          "minItems": 1,
+          "title": "Evidence Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "summary",
+        "artifact_ids",
+        "evidence_ids"
+      ],
+      "title": "ModulePage",
+      "type": "object"
+    },
+    "ModulePrompt": {
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "recorded",
+            "consolidated",
+            "suggested",
+            "edited"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "evidence_ids": {
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+            "type": "string"
+          },
+          "maxItems": 1000,
+          "minItems": 1,
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "source_pointer": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Pointer"
+        }
+      },
+      "required": [
+        "text",
+        "kind",
+        "evidence_ids"
+      ],
+      "title": "ModulePrompt",
+      "type": "object"
+    },
+    "ReplaceContent": {
+      "additionalProperties": false,
+      "properties": {
+        "op": {
+          "const": "replace_content",
+          "title": "Op",
+          "type": "string"
+        },
+        "nodes": {
+          "items": {
+            "$ref": "#/$defs/Step"
+          },
+          "maxItems": 200,
+          "title": "Nodes",
+          "type": "array"
+        },
+        "edges": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "control": "#/$defs/ControlEdge",
+                "data": "#/$defs/DataEdge",
+                "semantic": "#/$defs/SemanticEdge"
+              },
+              "propertyName": "kind"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/DataEdge"
+              },
+              {
+                "$ref": "#/$defs/ControlEdge"
+              },
+              {
+                "$ref": "#/$defs/SemanticEdge"
+              }
+            ]
+          },
+          "maxItems": 1000,
+          "title": "Edges",
+          "type": "array"
+        },
+        "variables": {
+          "items": {
+            "$ref": "#/$defs/Variable"
+          },
+          "maxItems": 200,
+          "title": "Variables",
+          "type": "array"
+        }
+      },
+      "required": [
+        "op",
+        "nodes",
+        "edges",
+        "variables"
+      ],
+      "title": "ReplaceContent",
+      "type": "object"
+    },
+    "ReviewVariable": {
+      "additionalProperties": false,
+      "properties": {
+        "op": {
+          "const": "review_variable",
+          "title": "Op",
+          "type": "string"
+        },
+        "variable_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Variable Id",
+          "type": "string"
+        },
+        "review": {
+          "enum": [
+            "accepted",
+            "rejected"
+          ],
+          "title": "Review",
+          "type": "string"
+        }
+      },
+      "required": [
+        "op",
+        "variable_id",
+        "review"
+      ],
+      "title": "ReviewVariable",
+      "type": "object"
+    },
+    "SemanticEdge": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "semantic",
+          "title": "Kind",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "source": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Source",
+          "type": "string"
+        },
+        "target": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Target",
+          "type": "string"
+        },
+        "relation": {
+          "enum": [
+            "refines",
+            "alternative_to",
+            "continues",
+            "inspired_by",
+            "supports"
+          ],
+          "title": "Relation",
+          "type": "string"
+        },
+        "explanation": {
+          "$ref": "#/$defs/Claim"
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "source",
+        "target",
+        "relation",
+        "explanation"
+      ],
+      "title": "SemanticEdge",
+      "type": "object"
+    },
+    "Step": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "intent",
+            "decision",
+            "generation",
+            "transform",
+            "composition",
+            "other"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "label": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "purpose": {
+          "$ref": "#/$defs/Claim"
+        },
+        "requirements": {
+          "items": {
+            "$ref": "#/$defs/Claim"
+          },
+          "maxItems": 50,
+          "title": "Requirements",
+          "type": "array"
+        },
+        "source_node_ids": {
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+            "type": "string"
+          },
+          "maxItems": 1000,
+          "title": "Source Node Ids",
+          "type": "array"
+        },
+        "run_ids": {
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+            "type": "string"
+          },
+          "maxItems": 1000,
+          "title": "Run Ids",
+          "type": "array"
+        },
+        "artifact_ids": {
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+            "type": "string"
+          },
+          "maxItems": 1000,
+          "title": "Artifact Ids",
+          "type": "array"
+        },
+        "evidence_ids": {
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+            "type": "string"
+          },
+          "maxItems": 1000,
+          "minItems": 1,
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "prompts": {
+          "items": {
+            "$ref": "#/$defs/ModulePrompt"
+          },
+          "maxItems": 200,
+          "title": "Prompts",
+          "type": "array"
+        },
+        "pages": {
+          "items": {
+            "$ref": "#/$defs/ModulePage"
+          },
+          "maxItems": 200,
+          "title": "Pages",
+          "type": "array"
+        },
+        "image_edits": {
+          "items": {
+            "$ref": "#/$defs/ModuleImageEdit"
+          },
+          "maxItems": 200,
+          "title": "Image Edits",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "label",
+        "purpose",
+        "requirements",
+        "source_node_ids",
+        "run_ids",
+        "artifact_ids",
+        "evidence_ids"
+      ],
+      "title": "Step",
+      "type": "object"
+    },
+    "ValueLocator": {
+      "additionalProperties": false,
+      "properties": {
+        "source_node_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Source Node Id",
+          "type": "string"
+        },
+        "evidence_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "pointer": {
+          "pattern": "^/",
+          "title": "Pointer",
+          "type": "string"
+        },
+        "decode": {
+          "enum": [
+            "identity",
+            "json_string"
+          ],
+          "title": "Decode",
+          "type": "string"
+        },
+        "value_pointer": {
+          "title": "Value Pointer",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_node_id",
+        "evidence_id",
+        "pointer",
+        "decode",
+        "value_pointer"
+      ],
+      "title": "ValueLocator",
+      "type": "object"
+    },
+    "Variable": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "step_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Step Id",
+          "type": "string"
+        },
+        "label": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "description": {
+          "$ref": "#/$defs/Claim"
+        },
+        "locator": {
+          "$ref": "#/$defs/ValueLocator"
+        },
+        "value_type": {
+          "enum": [
+            "string",
+            "array",
+            "number",
+            "integer",
+            "boolean",
+            "object"
+          ],
+          "title": "Value Type",
+          "type": "string"
+        },
+        "current_value": {
+          "$ref": "#/$defs/JsonValue"
+        },
+        "allowed_modes": {
+          "items": {
+            "enum": [
+              "keep",
+              "override",
+              "append"
+            ],
+            "type": "string"
+          },
+          "maxItems": 3,
+          "minItems": 1,
+          "title": "Allowed Modes",
+          "type": "array"
+        },
+        "separator": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Separator"
+        },
+        "review": {
+          "enum": [
+            "candidate",
+            "accepted",
+            "rejected"
+          ],
+          "title": "Review",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "step_id",
+        "label",
+        "description",
+        "locator",
+        "value_type",
+        "current_value",
+        "allowed_modes",
+        "separator",
+        "review"
+      ],
+      "title": "Variable",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "request_id": {
+      "maxLength": 200,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+      "title": "Request Id",
+      "type": "string"
+    },
+    "expected_revision_id": {
+      "maxLength": 200,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+      "title": "Expected Revision Id",
+      "type": "string"
+    },
+    "operations": {
+      "items": {
+        "discriminator": {
+          "mapping": {
+            "delete_edge": "#/$defs/DeleteEdge",
+            "replace_content": "#/$defs/ReplaceContent",
+            "replace_purpose": "#/$defs/ClaimEdit",
+            "review_variable": "#/$defs/ReviewVariable",
+            "set_label": "#/$defs/LabelEdit",
+            "upsert_edge": "#/$defs/EdgeEdit"
+          },
+          "propertyName": "op"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/$defs/LabelEdit"
+          },
+          {
+            "$ref": "#/$defs/ClaimEdit"
+          },
+          {
+            "$ref": "#/$defs/EdgeEdit"
+          },
+          {
+            "$ref": "#/$defs/DeleteEdge"
+          },
+          {
+            "$ref": "#/$defs/ReviewVariable"
+          },
+          {
+            "$ref": "#/$defs/ReplaceContent"
+          }
+        ]
+      },
+      "maxItems": 100,
+      "minItems": 1,
+      "title": "Operations",
+      "type": "array"
+    }
+  },
+  "required": [
+    "request_id",
+    "expected_revision_id",
+    "operations"
+  ],
+  "title": "GraphEditRequest",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:aica:semantic-design:0.1:GraphEditRequest"
+}

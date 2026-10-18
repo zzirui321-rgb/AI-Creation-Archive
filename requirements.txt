@@ -1,0 +1,110 @@
+# AiCA 五人共享开发依赖；每人使用独立的 aica Conda 环境。
+# 依据：AiCA_v1.0_Final_Project_Plan.pdf 和 Monorepo角色调整方案.pdf。
+
+# 建议开发栈：CPython 3.12.15、FastAPI、MCP SDK v2、本地 SQLite、外部模型 API。
+# Python 框架与数据库是本次环境选型建议，项目文档没有指定这些实现。
+
+# .aica v0.1 是本项目自定义协议，由 A 在 packages/schema/ 维护唯一真源。
+# Pydantic/jsonschema 仅提供建模和校验工具，MCP SDK 提供 MCP 通信；均不提供 .aica 实现。
+
+# 已确认：.aica 采用 JSON 加产物链接，支持用户上传自定义工作流，目标为公开用户。
+# 采集兼容 Codex、Claude Code 等主流客户端；生图仅用于 Demo，供应商待定。
+
+# 先创建基础环境，所有 Conda 包都应在 pip 安装之前装好：
+# conda create -n aica --override-channels -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge python=3.12.15 pip nodejs=24.21.0 git 'libsqlite>=3.51.3'
+
+# conda activate aica
+# pip install --requirement requirements.txt
+
+# 安装后检查：pip check
+# pnpm 安装到当前 Conda 环境，跨平台命令见 docs/SETUP.md。
+
+# React、React DOM、@xyflow/react、TypeScript、Vite 由 Node/pnpm 管理。
+# 开始前端开发时，在 package.json 与共享 pnpm lockfile 中固定这些依赖。
+
+# 如需本地视频合成，把 ffmpeg 加入上面的 Conda 创建命令。
+# 生图/视频模型通过外部 API 或 MCP 调用，供应商凭证另行配置。
+
+# A / 协议、记录与提取：MCP、Pydantic、Pillow，以及 Conda 提供的 Git。
+# D / 运行时、Golden Path、API：FastAPI、Uvicorn、NetworkX、Jinja2、SQLAlchemy、aiosqlite、Alembic。
+
+# B / 预览与产物渲染：HTTPX、Pillow；共享前端展示组件由 Node 包管理。
+# C / 核心画布：Node、pnpm、React Flow；此 Python 环境用于后端联调。
+
+# E / 素材、Showcase、集成：使用共享环境准备数据与验证回放。
+# 全组质量工具：pytest、pytest-asyncio、pytest-cov、respx、Ruff。
+
+# JSON、ZIP、哈希、日志使用 Python 标准库；本方案无需本地 CUDA/PyTorch。
+# 本文件用于 pip install -r，不能传给 conda create --file。
+
+# 下方完整固定直接和传递依赖，平台差异使用环境标记。
+# Intel Mac 的 cryptography 使用可用的 x86_64 预编译包版本；其他平台使用 50.0.2。
+
+aiosqlite==0.22.1
+alembic==1.20.0
+annotated-doc==0.0.5
+annotated-types==0.8.0
+anyio==4.15.1
+attrs==26.1.0
+certifi==2026.7.22
+cffi==2.1.1 ; platform_python_implementation != 'PyPy'
+click==8.5.0
+colorama==0.4.6 ; sys_platform == 'win32'
+coverage[toml]==7.16.2
+cryptography==48.0.1 ; platform_machine == 'x86_64' and sys_platform == 'darwin'
+cryptography==50.0.2 ; platform_machine != 'x86_64' or sys_platform != 'darwin'
+fastapi==0.143.2
+greenlet==3.5.6
+h11==0.16.0
+httpcore==1.0.9
+httpcore2==2.13.1 ; sys_platform != 'emscripten'
+httptools==0.9.0
+httpx==0.28.1
+httpx2==2.13.1
+httpx2-jsfetch==1.0 ; sys_platform == 'emscripten'
+idna==3.20
+iniconfig==2.3.1
+jinja2==3.1.6
+jsonschema==4.26.0
+jsonschema-specifications==2025.9.1
+mako==1.4.3
+markdown-it-py==4.2.0
+markupsafe==3.0.4
+mcp[cli]==2.3.0
+mcp-types==2.3.0
+mdurl==0.1.2
+networkx==3.7
+opentelemetry-api==1.45.1
+packaging==26.3
+pillow==12.3.0
+pluggy==1.7.0
+pycparser==3.11 ; implementation_name != 'PyPy' and platform_python_implementation != 'PyPy'
+pydantic==2.14.1
+pydantic-core==2.50.1
+pydantic-settings==2.16.0
+pygments==2.21.0
+pyjwt[crypto]==2.15.1
+pytest==9.1.1
+pytest-asyncio==1.4.0
+pytest-cov==7.1.0
+python-dotenv==1.2.4
+python-multipart==0.0.32
+pywin32==312 ; sys_platform == 'win32'
+pyyaml==6.0.3
+referencing==0.37.0
+respx==0.23.1
+rich==15.0.0
+rpds-py==2026.9.1
+ruff==0.17.1
+shellingham==1.5.4
+sqlalchemy[asyncio]==2.1.4
+sse-starlette==3.5.0
+starlette==1.8.0
+truststore==0.10.5 ; sys_platform != 'emscripten'
+typer==0.27.3
+typing-extensions==4.16.0
+typing-inspection==0.4.4
+uvicorn[standard]==0.54.0
+uvloop==0.23.0 ; platform_python_implementation != 'PyPy' and sys_platform != 'cygwin' and sys_platform != 'win32'
+watchfiles==1.3.0
+websockets==17.2

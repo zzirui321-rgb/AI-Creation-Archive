@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aica-gateway"
+version = "0.1.0"
+description = "AiCA project archive ingestion and reading API"
+requires-python = ">=3.12,<3.13"
+dependencies = ["aica-mcp==0.1.0", "aica-runtime==0.1.0", "fastapi>=0.143,<0.144", "uvicorn>=0.54,<0.55"]
+
+[project.scripts]
+aica-gateway = "aica_gateway.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["aica_gateway*"]

@@ -1,0 +1,522 @@
+{
+  "format": "aica-semantic-graph/0.1",
+  "graph_id": "fixture-graph",
+  "revision_id": "semantic-revision-1",
+  "parent_revision_id": null,
+  "repository_branch_id": "repo-main",
+  "state": "draft",
+  "executable": false,
+  "source": {
+    "import_id": "fixture-import",
+    "archive_sha256": "354bf63c568c23844bef20e640a58e9c6e12440d22dba9136300740dc40e8f19",
+    "archive_revision_id": "raw-revision-1",
+    "snapshot_id": "fixture-snapshot",
+    "stream_id": "fixture-stream",
+    "through_seq": 4
+  },
+  "parse": {
+    "parser_version": "design-0.1",
+    "prompt_version": "design-0.1",
+    "model": "deepseek-flash",
+    "mode": "rules_llm",
+    "input_sha256": "7158f8718449cca0e99485ce1ce9f1eb4d92f900baede7760c2d7bed449ac833"
+  },
+  "nodes": [
+    {
+      "id": "step-3a0378585542dfc1d932a7bc",
+      "kind": "intent",
+      "label": "太空漫画与配乐创作意图",
+      "purpose": {
+        "text": "用户提出生成一页太空漫画并配一段音乐的总体创作目标。",
+        "attributed_to": "user",
+        "actor_id": null,
+        "speech_act": "request",
+        "evidence_ids": [
+          "e-message-1",
+          "e-node-0"
+        ],
+        "origin": "llm",
+        "review": "candidate"
+      },
+      "requirements": [
+        {
+          "text": "生成一页太空漫画。",
+          "attributed_to": "user",
+          "actor_id": null,
+          "speech_act": "request",
+          "evidence_ids": [
+            "e-message-1"
+          ],
+          "origin": "llm",
+          "review": "candidate"
+        },
+        {
+          "text": "配一段音乐。",
+          "attributed_to": "user",
+          "actor_id": null,
+          "speech_act": "request",
+          "evidence_ids": [
+            "e-message-1"
+          ],
+          "origin": "llm",
+          "review": "candidate"
+        }
+      ],
+      "source_node_ids": [
+        "raw-plan"
+      ],
+      "run_ids": [],
+      "artifact_ids": [],
+      "evidence_ids": [
+        "e-message-1",
+        "e-node-0"
+      ],
+      "prompts": [],
+      "pages": [],
+      "image_edits": []
+    },
+    {
+      "id": "step-d5db6d5dc03bd6493a429cee",
+      "kind": "generation",
+      "label": "角色图生成与修订",
+      "purpose": {
+        "text": "由 Agent 提议黑猫宇航员与水彩风格并生成角色图，首次调用失败后按用户修订改为红色宇航服重新生成，形成可独立修改的角色图输出。",
+        "attributed_to": "analyst",
+        "actor_id": null,
+        "speech_act": "interpretation",
+        "evidence_ids": [
+          "e-message-2",
+          "e-message-3",
+          "e-message-4",
+          "e-node-1",
+          "e-node-2"
+        ],
+        "origin": "llm",
+        "review": "candidate"
+      },
+      "requirements": [
+        {
+          "text": "Agent 选择黑猫宇航员和水彩风格作为角色设定。",
+          "attributed_to": "agent",
+          "actor_id": "fixture-agent",
+          "speech_act": "proposal",
+          "evidence_ids": [
+            "e-message-2"
+          ],
+          "origin": "llm",
+          "review": "candidate"
+        },
+        {
+          "text": "保留黑猫设定，改成红色宇航服。",
+          "attributed_to": "user",
+          "actor_id": null,
+          "speech_act": "request",
+          "evidence_ids": [
+            "e-message-3"
+          ],
+          "origin": "llm",
+          "review": "candidate"
+        },
+        {
+          "text": "初次角色图调用失败，修订后重新生成角色图。",
+          "attributed_to": "tool",
+          "actor_id": null,
+          "speech_act": "observation",
+          "evidence_ids": [
+            "e-message-4"
+          ],
+          "origin": "llm",
+          "review": "candidate"
+        }
+      ],
+      "source_node_ids": [
+        "raw-character-first",
+        "raw-character-revised"
+      ],
+      "run_ids": [
+        "run-raw-character-first",
+        "run-raw-character-revised"
+      ],
+      "artifact_ids": [
+        "artifact-raw-character-revised"
+      ],
+      "evidence_ids": [
+        "e-message-2",
+        "e-message-3",
+        "e-message-4",
+        "e-node-1",
+        "e-node-2"
+      ],
+      "prompts": [],
+      "pages": [],
+      "image_edits": []
+    },
+    {
+      "id": "step-bd50eda105e170cbce9c6fb8",
+      "kind": "generation",
+      "label": "月球分镜生成",
+      "purpose": {
+        "text": "用户要求用修订后的角色图画月球分镜，生成分镜图输出。",
+        "attributed_to": "user",
+        "actor_id": null,
+        "speech_act": "request",
+        "evidence_ids": [
+          "e-message-3",
+          "e-node-3"
+        ],
+        "origin": "llm",
+        "review": "candidate"
+      },
+      "requirements": [
+        {
+          "text": "用新角色图画月球分镜。",
+          "attributed_to": "user",
+          "actor_id": null,
+          "speech_act": "request",
+          "evidence_ids": [
+            "e-message-3"
+          ],
+          "origin": "llm",
+          "review": "candidate"
+        }
+      ],
+      "source_node_ids": [
+        "raw-panel"
+      ],
+      "run_ids": [
+        "run-raw-panel"
+      ],
+      "artifact_ids": [
+        "artifact-raw-panel"
+      ],
+      "evidence_ids": [
+        "e-message-3",
+        "e-node-3"
+      ],
+      "prompts": [],
+      "pages": [],
+      "image_edits": []
+    },
+    {
+      "id": "step-0320c913776c98248ae4e541",
+      "kind": "generation",
+      "label": "太空氛围配乐生成",
+      "purpose": {
+        "text": "按用户配乐要求生成太空氛围配乐，作为可独立修改的音频输出。",
+        "attributed_to": "analyst",
+        "actor_id": null,
+        "speech_act": "interpretation",
+        "evidence_ids": [
+          "e-message-1",
+          "e-message-4",
+          "e-node-4"
+        ],
+        "origin": "llm",
+        "review": "candidate"
+      },
+      "requirements": [
+        {
+          "text": "配一段音乐。",
+          "attributed_to": "user",
+          "actor_id": null,
+          "speech_act": "request",
+          "evidence_ids": [
+            "e-message-1"
+          ],
+          "origin": "llm",
+          "review": "candidate"
+        }
+      ],
+      "source_node_ids": [
+        "raw-audio"
+      ],
+      "run_ids": [
+        "run-raw-audio"
+      ],
+      "artifact_ids": [
+        "artifact-raw-audio"
+      ],
+      "evidence_ids": [
+        "e-message-1",
+        "e-message-4",
+        "e-node-4"
+      ],
+      "prompts": [],
+      "pages": [],
+      "image_edits": []
+    }
+  ],
+  "edges": [
+    {
+      "kind": "data",
+      "id": "edge-d4ad84b68736c17899d2668c",
+      "source": "step-d5db6d5dc03bd6493a429cee",
+      "target": "step-bd50eda105e170cbce9c6fb8",
+      "state": "verified",
+      "archive_edge_id": "raw-character-panel",
+      "binding": {
+        "source_node_id": "raw-character-revised",
+        "source_output": "image",
+        "target_node_id": "raw-panel",
+        "target_input": "reference_image"
+      },
+      "explanation": {
+        "text": "A 源定义中的显式依赖。",
+        "attributed_to": "analyst",
+        "actor_id": null,
+        "speech_act": "observation",
+        "evidence_ids": [
+          "e-node-2",
+          "e-node-3"
+        ],
+        "origin": "rule",
+        "review": "accepted"
+      }
+    },
+    {
+      "kind": "semantic",
+      "id": "candidate-1554735e0bc0ab47432a704b",
+      "source": "step-3a0378585542dfc1d932a7bc",
+      "target": "step-d5db6d5dc03bd6493a429cee",
+      "relation": "supports",
+      "explanation": {
+        "text": "角色图生成服务于太空漫画创作意图，但意图节点本身不构成执行依赖。",
+        "attributed_to": "analyst",
+        "actor_id": null,
+        "speech_act": "interpretation",
+        "evidence_ids": [
+          "e-message-1",
+          "e-message-2"
+        ],
+        "origin": "llm",
+        "review": "candidate"
+      }
+    },
+    {
+      "kind": "semantic",
+      "id": "candidate-196c773248f56a6625f91536",
+      "source": "step-3a0378585542dfc1d932a7bc",
+      "target": "step-0320c913776c98248ae4e541",
+      "relation": "supports",
+      "explanation": {
+        "text": "配乐生成服务于用户提出的配乐要求，但无执行依赖证据。",
+        "attributed_to": "analyst",
+        "actor_id": null,
+        "speech_act": "interpretation",
+        "evidence_ids": [
+          "e-message-1",
+          "e-node-4"
+        ],
+        "origin": "llm",
+        "review": "candidate"
+      }
+    }
+  ],
+  "variables": [
+    {
+      "id": "var-53b304cb9918509bb9611fba",
+      "step_id": "step-d5db6d5dc03bd6493a429cee",
+      "label": "角色图提示词",
+      "description": {
+        "text": "角色图生成提示词，可开放修改角色外观与画风描述。",
+        "attributed_to": "analyst",
+        "actor_id": null,
+        "speech_act": "interpretation",
+        "evidence_ids": [
+          "e-node-2"
+        ],
+        "origin": "llm",
+        "review": "candidate"
+      },
+      "locator": {
+        "source_node_id": "raw-character-revised",
+        "evidence_id": "e-node-2",
+        "pointer": "/execution/inputs/arguments/value",
+        "decode": "json_string",
+        "value_pointer": "/prompt"
+      },
+      "value_type": "string",
+      "current_value": "黑猫宇航员，红色宇航服，水彩风格",
+      "allowed_modes": [
+        "keep",
+        "override"
+      ],
+      "separator": null,
+      "review": "candidate"
+    },
+    {
+      "id": "var-ff67d8e0fc2383c55b87244c",
+      "step_id": "step-d5db6d5dc03bd6493a429cee",
+      "label": "角色图随机种子",
+      "description": {
+        "text": "角色图生成的随机种子参数。",
+        "attributed_to": "analyst",
+        "actor_id": null,
+        "speech_act": "interpretation",
+        "evidence_ids": [
+          "e-node-2"
+        ],
+        "origin": "llm",
+        "review": "candidate"
+      },
+      "locator": {
+        "source_node_id": "raw-character-revised",
+        "evidence_id": "e-node-2",
+        "pointer": "/execution/inputs/arguments/value",
+        "decode": "json_string",
+        "value_pointer": "/seed"
+      },
+      "value_type": "integer",
+      "current_value": 42,
+      "allowed_modes": [
+        "keep",
+        "override"
+      ],
+      "separator": null,
+      "review": "candidate"
+    },
+    {
+      "id": "var-5f3e103a6c487093bbd542cd",
+      "step_id": "step-bd50eda105e170cbce9c6fb8",
+      "label": "分镜提示词",
+      "description": {
+        "text": "分镜生成提示词，可开放修改分镜内容描述。",
+        "attributed_to": "analyst",
+        "actor_id": null,
+        "speech_act": "interpretation",
+        "evidence_ids": [
+          "e-node-3"
+        ],
+        "origin": "llm",
+        "review": "candidate"
+      },
+      "locator": {
+        "source_node_id": "raw-panel",
+        "evidence_id": "e-node-3",
+        "pointer": "/execution/inputs/arguments/value",
+        "decode": "json_string",
+        "value_pointer": "/prompt"
+      },
+      "value_type": "string",
+      "current_value": "用选定角色图画月球分镜",
+      "allowed_modes": [
+        "keep",
+        "override"
+      ],
+      "separator": null,
+      "review": "candidate"
+    },
+    {
+      "id": "var-50b452fcb60ad884c89e9c3a",
+      "step_id": "step-0320c913776c98248ae4e541",
+      "label": "配乐提示词",
+      "description": {
+        "text": "配乐生成提示词，可开放修改音乐氛围描述。",
+        "attributed_to": "analyst",
+        "actor_id": null,
+        "speech_act": "interpretation",
+        "evidence_ids": [
+          "e-node-4"
+        ],
+        "origin": "llm",
+        "review": "candidate"
+      },
+      "locator": {
+        "source_node_id": "raw-audio",
+        "evidence_id": "e-node-4",
+        "pointer": "/execution/inputs/arguments/value",
+        "decode": "json_string",
+        "value_pointer": "/prompt"
+      },
+      "value_type": "string",
+      "current_value": "太空氛围配乐",
+      "allowed_modes": [
+        "keep",
+        "override"
+      ],
+      "separator": null,
+      "review": "candidate"
+    }
+  ],
+  "evidence": [
+    {
+      "kind": "archive",
+      "id": "e-node-0",
+      "pointer": "/graph/nodes/0",
+      "source_sha256": "354bf63c568c23844bef20e640a58e9c6e12440d22dba9136300740dc40e8f19"
+    },
+    {
+      "kind": "archive",
+      "id": "e-node-1",
+      "pointer": "/graph/nodes/1",
+      "source_sha256": "354bf63c568c23844bef20e640a58e9c6e12440d22dba9136300740dc40e8f19"
+    },
+    {
+      "kind": "archive",
+      "id": "e-node-2",
+      "pointer": "/graph/nodes/2",
+      "source_sha256": "354bf63c568c23844bef20e640a58e9c6e12440d22dba9136300740dc40e8f19"
+    },
+    {
+      "kind": "archive",
+      "id": "e-node-3",
+      "pointer": "/graph/nodes/3",
+      "source_sha256": "354bf63c568c23844bef20e640a58e9c6e12440d22dba9136300740dc40e8f19"
+    },
+    {
+      "kind": "archive",
+      "id": "e-node-4",
+      "pointer": "/graph/nodes/4",
+      "source_sha256": "354bf63c568c23844bef20e640a58e9c6e12440d22dba9136300740dc40e8f19"
+    },
+    {
+      "kind": "event",
+      "id": "e-message-1",
+      "artifact_id": "fixture-history",
+      "line": 1,
+      "event_id": "event-1",
+      "pointer": "/payload/content",
+      "source_sha256": "22e4bd6fd8a6b0c73a76db2d04dbb5a171dae2f1d5bcb86743c5116566ef3305"
+    },
+    {
+      "kind": "event",
+      "id": "e-message-2",
+      "artifact_id": "fixture-history",
+      "line": 2,
+      "event_id": "event-2",
+      "pointer": "/payload/content",
+      "source_sha256": "22e4bd6fd8a6b0c73a76db2d04dbb5a171dae2f1d5bcb86743c5116566ef3305"
+    },
+    {
+      "kind": "event",
+      "id": "e-message-3",
+      "artifact_id": "fixture-history",
+      "line": 3,
+      "event_id": "event-3",
+      "pointer": "/payload/content",
+      "source_sha256": "22e4bd6fd8a6b0c73a76db2d04dbb5a171dae2f1d5bcb86743c5116566ef3305"
+    },
+    {
+      "kind": "event",
+      "id": "e-message-4",
+      "artifact_id": "fixture-history",
+      "line": 4,
+      "event_id": "event-4",
+      "pointer": "/payload/content",
+      "source_sha256": "22e4bd6fd8a6b0c73a76db2d04dbb5a171dae2f1d5bcb86743c5116566ef3305"
+    }
+  ],
+  "coverage": {
+    "recording_complete": true,
+    "selected_source_node_ids": [
+      "raw-plan",
+      "raw-character-first",
+      "raw-character-revised",
+      "raw-panel",
+      "raw-audio"
+    ],
+    "unassigned_source_node_ids": [],
+    "omitted_history_artifact_ids": [],
+    "issues": []
+  }
+}

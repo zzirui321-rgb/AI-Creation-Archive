@@ -1,0 +1,11 @@
+{
+  "request_id": "edit-request-1",
+  "expected_revision_id": "semantic-revision-1",
+  "operations": [
+    {
+      "op": "set_label",
+      "node_id": "step-character",
+      "value": "角色参考图"
+    }
+  ]
+}

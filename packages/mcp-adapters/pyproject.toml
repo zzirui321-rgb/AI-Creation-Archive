@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aica-mcp"
+version = "0.1.0"
+description = "Consent-based AiCA recorder and MCP server"
+requires-python = ">=3.12,<3.13"
+dependencies = ["aica-schema==0.1.0", "mcp>=2.3,<3", "httpx>=0.28,<0.29"]
+
+[project.scripts]
+aica = "aica_mcp.cli:main"
+
+[tool.setuptools.package-data]
+aica_mcp = ["approval.html", "approval.js", "connect.html", "connect.js", "opencode-plugin.mjs"]

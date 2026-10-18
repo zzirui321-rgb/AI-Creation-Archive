@@ -1,0 +1,32 @@
+* { box-sizing: border-box; }
+body { margin: 0; background: #f3f5f4; color: #25352e; font-family: Inter, Arial, sans-serif; font-size: 14px; letter-spacing: 0; }
+button, input, textarea, select { font: inherit; }
+button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 36px; border: 1px solid #c6d2cc; border-radius: 4px; background: white; padding: 7px 10px; color: #263b31; cursor: pointer; }
+button:disabled { opacity: .55; cursor: default; }
+button[aria-pressed="true"] { background: #e1efe6; border-color: #4c8a66; }
+.semantic-review > header { display: flex; align-items: center; gap: 18px; min-height: 56px; padding: 12px 24px; background: #fff; border-bottom: 1px solid #dbe2de; }
+.semantic-review > header strong { font-size: 23px; }
+.semantic-local { margin-left: auto; font-size: 12px; color: #607068; }
+.semantic-review main { display: grid; grid-template-columns: 276px minmax(0, 1fr); min-height: calc(100vh - 56px); }
+.semantic-controls { padding: 22px 18px; background: #fff; border-right: 1px solid #dbe2de; display: flex; flex-direction: column; gap: 15px; min-width: 0; }
+.semantic-controls h1 { font-size: 20px; margin: 0 0 4px; }
+.semantic-controls label { display: flex; flex-direction: column; gap: 7px; font-size: 12px; color: #4c5f54; }
+.semantic-controls input:not([type="checkbox"]), .semantic-controls select, .semantic-controls textarea { width: 100%; min-width: 0; border: 1px solid #cbd5cf; border-radius: 4px; padding: 8px; color: #23372b; background: #fff; }
+.semantic-controls textarea { resize: vertical; }
+.semantic-controls details { border-top: 1px solid #dbe2de; padding-top: 16px; }
+.semantic-controls details label { margin-top: 12px; }
+.semantic-controls .semantic-checkbox { flex-direction: row; align-items: center; }
+.semantic-stages { display: flex; gap: 6px; }
+.semantic-workspace { padding: 22px; min-width: 0; }
+.semantic-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; align-items: start; }
+.semantic-columns > div { min-width: 0; }
+.semantic-columns h2 { font-size: 15px; margin: 0 0 14px; }
+.semantic-empty { display: grid; place-items: center; min-height: 280px; background: #e8eeea; border: 1px dashed #bdccc2; color: #607367; }
+.semantic-error { background: #fff0ed; color: #943b2c; padding: 12px; overflow-wrap: anywhere; }
+.semantic-source { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; padding: 18px 0; color: #607568; font-size: 12px; }
+.semantic-source code { overflow-wrap: anywhere; word-break: break-all; }
+.semantic-receipt { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 8px; font-size: 12px; }
+.semantic-receipt dt { color: #68786f; }
+.semantic-receipt dd { margin: 0; overflow-wrap: anywhere; }
+@media (max-width: 1050px) { .semantic-columns { grid-template-columns: 1fr; } }
+@media (max-width: 640px) { .semantic-review main { grid-template-columns: 1fr; } .semantic-controls { border-right: 0; border-bottom: 1px solid #dbe2de; } .semantic-workspace { padding: 16px; } .semantic-review > header { padding: 12px 16px; flex-wrap: wrap; } .semantic-local { margin-left: 0; } }

@@ -1,0 +1,12 @@
+{
+  "request_id": "layout-request-1",
+  "graph_revision_id": "semantic-revision-1",
+  "expected_layout_version": 0,
+  "positions": [
+    {
+      "node_id": "step-character",
+      "x": 200.0,
+      "y": 80.0
+    }
+  ]
+}

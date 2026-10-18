@@ -1,0 +1,16 @@
+.aica-c-preview .aica-artifacts { --aica-ink: #e4edf3; --aica-muted: #a3b0bf; --aica-line: #364350; --aica-surface: #19232d; }
+.aica-c-preview.preview-dock { display: block; }
+.aica-c-preview .aica-artifacts button, .aica-c-preview .aica-icon { background: #1b2631; color: #dfe9ef; }
+.aica-c-preview .aica-code { background: #15202b; color: #e5edf4; }
+.aica-c-preview .aica-reuse-heading strong, .aica-c-preview .aica-reuse-heading > span:last-child { color: #8cdaa8; }
+.aica-c-preview .preview-media { display: block; aspect-ratio: auto; min-height: 240px; height: auto; max-height: none; overflow: visible; }
+.aica-c-preview .preview-media > .aica-artifact, .aica-c-preview .preview-media > .aica-diff { position: relative; height: auto; width: 100%; }
+.aica-c-preview .aica-diff-columns { grid-template-columns: minmax(0, 1fr); }
+.aica-c-preview .preview-dialog .aica-diff-columns { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.aica-c-preview .aica-artifact { width: 100%; }
+.aica-c-preview .aica-c-modes { display: flex; gap: 4px; padding: 8px 0; }
+.aica-c-modes button { flex: 1; border: 1px solid #3b4958; background: #15202b; color: #adbdca; border-radius: 4px; padding: 8px 6px; cursor: pointer; }
+.aica-c-modes button[aria-pressed="true"] { background: #29423a; color: #aeedca; border-color: #57977a; }
+.aica-c-reference { display: grid; gap: 5px; font-size: 10px; line-height: 1.5; color: #a9b7c6; padding: 12px 0; overflow-wrap: anywhere; }
+.aica-c-preview .aica-reuse-heading strong { font-size: 15px; }
+@media (max-width: 640px) { .aica-c-preview .preview-dialog .aica-diff-columns { grid-template-columns: minmax(0, 1fr); } }

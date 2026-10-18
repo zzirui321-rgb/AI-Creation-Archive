@@ -1,0 +1,10 @@
+{
+  "title": "月光温室 · 创作记录示例",
+  "description": "仅用于验证导入展示的示例，不是真实录制记录。",
+  "steps": [
+    { "id": "step1", "title": "概念构思", "kind": "text", "prompt": "一座月光下的玻璃温室，银蓝色植物，安静的夜晚。", "model": "", "mode": "text", "harness": { "client": "example", "tools": ["prompt-notes"] }, "provenance": "inferred" },
+    { "id": "step2", "title": "生成温室画面", "kind": "image", "prompt": "月光下的玻璃温室，银蓝色植物，柔和的体积光，电影感构图。", "model": "qwen-image", "mode": "text-to-image", "params": { "size": "1024*1024" }, "harness": { "client": "example", "tool": "image_generation" }, "depends_on": ["step1"], "provenance": "inferred" },
+    { "id": "step3", "title": "构图与成品整理", "kind": "composition", "prompt": "保留温室主体与月光，整理画面留白。", "mode": "compose", "depends_on": ["step2"], "provenance": "inferred" }
+  ],
+  "golden_path": ["step1", "step2", "step3"]
+}

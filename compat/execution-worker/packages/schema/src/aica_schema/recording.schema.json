@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "platform_config": {"type":"object","additionalProperties":false,"required":["version","server_url","project_id","token_env","auto_upload","interval_seconds","allow_loopback_http"],"properties":{"version":{"const":1},"server_url":{"type":"string","minLength":1,"maxLength":2048},"project_id":{"type":"string","format":"uuid"},"token_env":{"type":"string","pattern":"^[A-Z_][A-Z0-9_]{0,127}$"},"auto_upload":{"type":"boolean"},"interval_seconds":{"type":"integer","minimum":1,"maximum":300},"allow_loopback_http":{"type":"boolean"}}},
+  "step_manifest": {
+    "type": "object", "additionalProperties": false, "required": ["nodes", "edges", "files"],
+    "properties": {
+      "nodes": {"type": "array", "minItems": 1, "maxItems": 1000, "items": {"$ref": "#/$defs/node"}},
+      "edges": {"type": "array", "maxItems": 10000, "items": {"$ref": "#/$defs/graph/properties/edges/items"}},
+      "files": {"type": "array", "maxItems": 200, "items": {"type": "object", "additionalProperties": false, "required": ["path", "mime_type"], "properties": {
+        "path": {"type": "string", "minLength": 1}, "mime_type": {"type": "string", "minLength": 1}, "producer_node_id": {"$ref": "#/$defs/nullable_id"}
+      }}}
+    }
+  },
+  "payloads": {
+    "harness.registered": {"$ref": "#/$defs/harness"},
+    "agent.registered": {"$ref": "#/$defs/agent"},
+    "definition.replaced": {
+      "type": "object", "additionalProperties": false, "required": ["graph", "variables", "interactive_questions"],
+      "properties": {"graph": {"$ref": "#/$defs/graph"}, "variables": {"type": "object", "additionalProperties": {"$ref": "#/$defs/variable"}}, "interactive_questions": {"type": "array", "items": {"$ref": "#/$defs/question"}}}
+    },
+    "variables.changed": {"type": "object", "additionalProperties": false, "required": ["operations"], "properties": {"operations": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/operation"}}}},
+    "tool.started": {"$ref": "#/$defs/run"},
+    "tool.finished": {
+      "type": "object", "additionalProperties": false, "required": ["run_id", "state", "ended_at", "outputs", "artifact_ids"],
+      "properties": {"run_id": {"$ref": "#/$defs/id"}, "state": {"enum": ["succeeded", "failed", "cancelled"]}, "ended_at": {"$ref": "#/$defs/time"}, "outputs": {"type": "object"}, "artifact_ids": {"$ref": "#/$defs/ids"}, "error": {"type": "string"}, "duration_ms": {"type": "number", "minimum": 0}, "preview_stage": {"enum": ["draft", "final"]}, "cache": {"$ref": "#/$defs/run/properties/cache"}}
+    },
+    "artifact.recorded": {"$ref": "#/$defs/artifact"},
+    "artifact.location_added": {
+      "type": "object", "additionalProperties": false, "required": ["artifact_id", "sha256", "uri"],
+      "properties": {"artifact_id": {"$ref": "#/$defs/id"}, "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "uri": {"type": "string", "minLength": 1}}
+    },
+    "message.recorded": {"type": "object", "additionalProperties": false, "required": ["role", "content"], "properties": {"role": {"enum": ["user", "assistant", "tool", "system"]}, "content": {"type": "string"}, "node_id": {"$ref": "#/$defs/id"}}},
+    "session.paused": {"type": "object", "additionalProperties": false, "properties": {}},
+    "session.resumed": {"type": "object", "additionalProperties": false, "properties": {}},
+    "session.closed": {"type": "object", "additionalProperties": false, "properties": {}},
+    "note.recorded": {"type": "object", "additionalProperties": false, "required": ["text", "provenance"], "properties": {"text": {"type": "string"}, "provenance": {"$ref": "#/$defs/provenance"}}}
+  },
+  "tools": [
+    {
+      "name": "aica_import_archive", "description": "Restore a user-selected self-contained aica.json into a new project subdirectory of this workspace. Validates the shared protocol and embedded artifacts, preserves original IDs and URIs, and never replaces another project. Requires explicit import approval. Reuse request_id with identical source and target on retry. Does not execute workflows, start recording or inherit historical Session credentials. Open the restored directory as the agent workspace and reconnect MCP to continue with fresh consent.", "readOnly": false,
+      "inputSchema": {"type": "object", "additionalProperties": false, "required": ["request_id", "path", "target", "confirm_import"], "properties": {
+        "request_id": {"$ref": "#/$defs/id"}, "path": {"type": "string", "minLength": 1, "maxLength": 512}, "target": {"type": "string", "minLength": 1, "maxLength": 512}, "confirm_import": {"type": "boolean", "const": true}
+      }}
+    },
+    {
+      "name": "aica_record_step", "description": "Record one completed, actually observed tool/model step with its client, original timestamps, result, explicit dependencies and selected output files. Creates the node, Run and artifact links, never executes the tool. Requires an authorized Session. Reuse request_id and identical data on retry. Does not intercept native client tools automatically.", "readOnly": false,
+      "inputSchema": {"type": "object", "additionalProperties": false, "required": ["request_id", "session_id", "session_token", "step"], "properties": {
+        "request_id": {"$ref": "#/$defs/id"}, "session_id": {"$ref": "#/$defs/id"}, "session_token": {"type": "string", "minLength": 20}, "expected_revision": {"$ref": "#/$defs/id"},
+        "step": {"type": "object", "additionalProperties": false, "required": ["label", "client", "execution", "started_at", "ended_at", "state"], "properties": {
+          "label": {"type": "string", "minLength": 1}, "description": {"type": "string"}, "client": {"type": "string", "minLength": 1}, "model": {"type": "object"}, "harness": {"$ref": "#/$defs/harness"}, "execution": {"$ref": "#/$defs/execution"},
+          "inputs": {"type": "object"}, "outputs": {"type": "object"}, "started_at": {"$ref": "#/$defs/time"}, "ended_at": {"$ref": "#/$defs/time"}, "state": {"enum": ["succeeded", "failed", "cancelled"]}, "error": {"type": "string"}, "depends_on": {"$ref": "#/$defs/ids"}, "provenance": {"$ref": "#/$defs/provenance"},
+          "artifacts": {"type": "array", "maxItems": 100, "items": {"type": "object", "additionalProperties": false, "required": ["path", "mime_type"], "properties": {"path": {"type": "string", "minLength": 1}, "mime_type": {"type": "string", "minLength": 1}}}}
+        }}
+      }}
+    },
+    {
+      "name": "aica_check_consent", "description": "Check the Session credential and whether recording this event type is currently allowed before collecting or queueing content.",
+      "inputSchema": {"type": "object", "additionalProperties": false, "required": ["session_id", "session_token", "event_type"], "properties": {"session_id": {"$ref": "#/$defs/id"}, "session_token": {"type": "string", "minLength": 20}, "event_type": {"type": "string"}, "event_id": {"$ref": "#/$defs/id"}}}, "readOnly": true
+    },
+    {
+      "name": "aica_start_session", "description": "Start a recording session ONLY after the user explicitly answers Yes or No. record=false persists no Agent, Harness, prompt or tool content. Keep the returned session_token private and reuse request_id when retrying.",
+      "inputSchema": {"type": "object", "additionalProperties": false, "required": ["request_id", "record"], "properties": {"request_id": {"$ref": "#/$defs/id"}, "record": {"type": "boolean"}, "include_children": {"type": "boolean", "default": false}}},
+      "readOnly": false
+    },
+    {
+      "name": "aica_submit_event", "description": "Persist an authorized creation event. Preserve event_id and source_seq across retries. Definition edits require expected_revision. This records observations and never executes a command or model.",
+      "inputSchema": {"type": "object", "additionalProperties": false, "required": ["session_token", "event"], "properties": {"session_token": {"type": "string", "minLength": 20}, "event": {"$ref": "#/$defs/event"}}},
+      "readOnly": false
+    },
+    {
+      "name": "aica_get_archive", "description": "Read the latest validated archive projection, including its commit boundary and unresolved evidence gaps.",
+      "inputSchema": {"type": "object", "additionalProperties": false, "properties": {}}, "readOnly": true
+    },
+    {
+      "name": "aica_get_revision", "description": "Read one current or historical workflow definition. Historical bytes must match the referenced hash; missing or remote-only revisions return an explicit error. This never changes the active revision.",
+      "inputSchema": {"type": "object", "additionalProperties": false, "required": ["revision_id"], "properties": {"revision_id": {"$ref": "#/$defs/id"}}}, "readOnly": true
+    },
+    {
+      "name": "aica_get_items", "description": "Read a bounded page of archive metadata without loading artifact bytes. Pass the returned snapshot_id for subsequent pages to detect concurrent changes.",
+      "inputSchema": {"type": "object", "additionalProperties": false, "required": ["collection"], "properties": {"collection": {"enum": ["nodes", "edges", "branches", "runs", "artifacts", "harnesses", "agents", "sessions", "history"]}, "offset": {"type": "integer", "minimum": 0, "default": 0}, "limit": {"type": "integer", "minimum": 1, "maximum": 200, "default": 50}, "snapshot_id": {"$ref": "#/$defs/id"}}, "allOf": [{"if": {"required": ["offset"], "properties": {"offset": {"minimum": 1}}}, "then": {"required": ["snapshot_id"]}}]}, "readOnly": true
+    },
+    {
+      "name": "aica_check_references", "description": "Check a bounded page of project-local artifact references against hashes and sizes without downloading remote URLs. Reports observed readability separately from declared availability. This is not execution approval or a complete Runtime preflight.",
+      "inputSchema": {"type": "object", "additionalProperties": false, "properties": {"offset": {"type": "integer", "minimum": 0, "default": 0}, "limit": {"type": "integer", "minimum": 1, "maximum": 200, "default": 50}, "snapshot_id": {"$ref": "#/$defs/id"}}, "allOf": [{"if": {"required": ["offset"], "properties": {"offset": {"minimum": 1}}}, "then": {"required": ["snapshot_id"]}}]}, "readOnly": true
+    },
+    {
+      "name": "aica_validate_archive", "description": "Validate AiCA v0.1 JSON structure, DAG dependencies, variable bindings, references and consent relationships without writing files.",
+      "inputSchema": {"type": "object", "additionalProperties": false, "required": ["archive"], "properties": {"archive": {"type": "object"}}}, "readOnly": true
+    },
+    {
+      "name": "aica_export_archive", "description": "Flush a consistent archive. Set portable=true to export one self-contained JSON with every registered artifact, ready for platform import; output defaults to exports/aica.json relative to this project. This does not upload or publish anything.",
+      "inputSchema": {"type": "object", "additionalProperties": false, "properties": {"portable": {"type": "boolean", "default": false}, "output": {"type": "string", "minLength": 1, "maxLength": 512}}}, "readOnly": false
+    },
+    {
+      "name": "aica_get_events", "description": "Read a bounded page of committed events. Raw messages may be private; do not publish them without separate permission.",
+      "inputSchema": {"type": "object", "additionalProperties": false, "properties": {"after_seq": {"type": "integer", "minimum": 0, "default": 0}, "limit": {"type": "integer", "minimum": 1, "maximum": 200, "default": 50}}}, "readOnly": true
+    },
+    {
+      "name": "aica_capture_artifact", "description": "Hash and copy an explicitly selected project-local file into immutable artifact storage. Requires an active authorized session and a normal event envelope of type artifact.recorded with an empty payload; its payload is filled by this adapter.",
+      "inputSchema": {"type": "object", "additionalProperties": false, "required": ["session_token", "event", "path", "mime_type"], "properties": {"session_token": {"type": "string", "minLength": 20}, "event": {"$ref": "#/$defs/event"}, "path": {"type": "string", "minLength": 1}, "mime_type": {"type": "string", "minLength": 1}, "producer_node_id": {"$ref": "#/$defs/nullable_id"}, "producer_run_id": {"$ref": "#/$defs/nullable_id"}}}, "readOnly": false
+    },
+    {"name":"aica_bind_platform","description":"Bind this workspace to a user-approved platform project. Explicit consent covers the entire current archive, registered artifacts and subsequent recorded changes; uploading then runs automatically in the coordinator. Credentials are read only from token_env and never accepted as tool arguments. Writes .aicaconfig and a local authorization receipt. Does not create a platform account or project and does not grant recording consent.","readOnly":false,"inputSchema":{"type":"object","additionalProperties":false,"required":["server_url","project_id","confirm_upload"],"properties":{"server_url":{"type":"string","minLength":1,"maxLength":2048},"project_id":{"type":"string","format":"uuid"},"confirm_upload":{"const":true,"type":"boolean"},"token_env":{"type":"string","pattern":"^[A-Z_][A-Z0-9_]{0,127}$","default":"AICA_UPLOAD_TOKEN"},"interval_seconds":{"type":"integer","minimum":1,"maximum":300,"default":5},"allow_loopback_http":{"type":"boolean","default":false}}}},
+    {"name":"aica_platform_status","description":"Read binding, automatic upload state, pending work, retry errors and last verified remote receipt. A successful tool response does not by itself mean upload succeeded; inspect state and receipt.","readOnly":true,"inputSchema":{"type":"object","additionalProperties":false,"properties":{}}},
+    {"name":"aica_pause_upload","description":"Pause new platform upload requests while local recording continues. Already transmitted requests cannot be retracted; pending bytes remain available for recovery.","readOnly":false,"inputSchema":{"type":"object","additionalProperties":false,"properties":{}}},
+    {"name":"aica_resume_upload","description":"Resume a previously authorized binding only after renewed user approval, resetting the bounded automatic retry budget. Retains the original pending bundle for idempotent recovery.","readOnly":false,"inputSchema":{"type":"object","additionalProperties":false,"required":["confirm_upload"],"properties":{"confirm_upload":{"const":true,"type":"boolean"}}}},
+    {"name":"aica_sync_platform","description":"Queue a retry or the latest recorded snapshot for an enabled authorized binding. Uses unchanged pending bytes first, never uploads an unbound or paused project, and returns before the background network request completes.","readOnly":false,"inputSchema":{"type":"object","additionalProperties":false,"properties":{}}}
+  ]
+}

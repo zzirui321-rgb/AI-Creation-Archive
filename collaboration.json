@@ -1,0 +1,954 @@
+{
+  "kind": "agent-collaboration",
+  "version": "2.0",
+  "project": "AiCA",
+  "roles": {
+    "A": {
+      "name": "协议与全渠道采集",
+      "github_identities": [
+        "Alvintxh"
+      ]
+    },
+    "B": {
+      "name": "预览与产物展示",
+      "github_identities": []
+    },
+    "C": {
+      "name": "核心画布与应用",
+      "github_identities": []
+    },
+    "D": {
+      "name": "图运行时与平台 API",
+      "github_identities": [],
+      "current_session_role_confirmation": "explicit-user: user confirmed D and selected an independent implementation based only on A snapshot; CLI account yean8266 verified, no other task ownership transferred"
+    },
+    "E": {
+      "name": "资产集成归档路演",
+      "github_identities": []
+    }
+  },
+  "modules": {
+    "archive-contract": {
+      "owner_role": "A",
+      "purpose": "共享归档协议与类型",
+      "binding_status": "accepted"
+    },
+    "capture-reconstruction": {
+      "owner_role": "A",
+      "purpose": "授权记录和事后提取",
+      "binding_status": "accepted"
+    },
+    "preview-execution": {
+      "owner_role": "B",
+      "purpose": "Draft 和高质量执行",
+      "binding_status": "proposed"
+    },
+    "artifact-presentation": {
+      "owner_role": "B",
+      "purpose": "产物展示组件",
+      "binding_status": "proposed"
+    },
+    "graph-application": {
+      "owner_role": "C",
+      "purpose": "应用壳与交互画布",
+      "binding_status": "proposed"
+    },
+    "graph-runtime": {
+      "owner_role": "D",
+      "purpose": "缓存依赖与执行内核",
+      "binding_status": "accepted"
+    },
+    "platform-api": {
+      "owner_role": "D",
+      "purpose": "平台 API 与路由装配",
+      "binding_status": "accepted"
+    },
+    "demo-assets": {
+      "owner_role": "E",
+      "purpose": "标准业务数据和演示素材",
+      "binding_status": "proposed"
+    },
+    "integration-demo": {
+      "owner_role": "E",
+      "purpose": "联调与最终验收",
+      "binding_status": "proposed"
+    },
+    "coordination-docs": {
+      "owner_role": "E",
+      "purpose": "协作与路演资料",
+      "binding_status": "accepted"
+    }
+  },
+  "bindings": [
+    {
+      "resource_id": "archive-package",
+      "module_id": "archive-contract",
+      "locator": {
+        "kind": "directory",
+        "relative_location": "packages/schema"
+      },
+      "status": "accepted",
+      "discovery_commit": "3bbde7c",
+      "evidence": [
+        "Existing aica-schema pyproject, exported protocol functions, JSON Schemas and protocol tests at 3bbde7c"
+      ],
+      "accepted_by": [
+        "Alvintxh: explicit-user role A and T011 migration authorization"
+      ]
+    },
+    {
+      "resource_id": "capture-package",
+      "module_id": "capture-reconstruction",
+      "locator": {
+        "kind": "directory",
+        "relative_location": "packages/mcp-adapters"
+      },
+      "status": "accepted",
+      "discovery_commit": "3bbde7c",
+      "evidence": [
+        "Existing aica-mcp entry point, stdio server, RecorderClient and integration tests at 3bbde7c"
+      ],
+      "accepted_by": [
+        "Alvintxh: explicit-user role A and T011 migration authorization"
+      ]
+    },
+    {
+      "resource_id": "preview-service",
+      "module_id": "preview-execution",
+      "locator": {
+        "kind": "directory",
+        "relative_location": "apps/gateway/src/preview"
+      },
+      "status": "proposed",
+      "discovery_commit": "3bbde7c",
+      "evidence": [
+        "Existing placeholder and previously confirmed B submodule boundary; implementation and B identity pending"
+      ],
+      "accepted_by": []
+    },
+    {
+      "resource_id": "artifact-components",
+      "module_id": "artifact-presentation",
+      "locator": {
+        "kind": "directory",
+        "relative_location": "packages/artifact-renderers"
+      },
+      "status": "proposed",
+      "discovery_commit": "3bbde7c",
+      "evidence": [
+        "Existing placeholder; B identity and module exports pending"
+      ],
+      "accepted_by": []
+    },
+    {
+      "resource_id": "web-application",
+      "module_id": "graph-application",
+      "locator": {
+        "kind": "directory",
+        "relative_location": "apps/web"
+      },
+      "status": "proposed",
+      "discovery_commit": "3bbde7c",
+      "evidence": [
+        "Existing placeholder; C identity and application entry point pending"
+      ],
+      "accepted_by": []
+    },
+    {
+      "resource_id": "runtime-package",
+      "module_id": "graph-runtime",
+      "locator": {
+        "kind": "directory",
+        "relative_location": "packages/runtime"
+      },
+      "status": "accepted",
+      "discovery_commit": "dfa804332704446789394da10c9a04c3f520919c",
+      "evidence": [
+        "Existing placeholder; D identity and runtime implementation pending",
+        "Current user explicitly assigned semantic analysis of A facts to D; standalone inferred reports and DeepSeek integration, no changes to A protocol"
+      ],
+      "accepted_by": [
+        "current user: explicit D semantic-analysis task authorization"
+      ]
+    },
+    {
+      "resource_id": "gateway-application",
+      "module_id": "platform-api",
+      "locator": {
+        "kind": "directory",
+        "relative_location": "apps/gateway"
+      },
+      "status": "accepted",
+      "discovery_commit": "57b02f069d7974528afa58cea6151f7b646dc0da",
+      "evidence": [
+        "Existing service parent placeholder; excludes independently owned preview-service",
+        "Explicit user selected independent D implementation from initial A snapshot; phase 1 import/storage/read only; preview implementation excluded"
+      ],
+      "accepted_by": [
+        "current user: explicit D role and independent implementation authorization in this session"
+      ],
+      "excluded_resource_ids": [
+        "preview-service"
+      ]
+    },
+    {
+      "resource_id": "comic-assets",
+      "module_id": "demo-assets",
+      "locator": {
+        "kind": "directory",
+        "relative_location": "examples/ai-comic"
+      },
+      "status": "proposed",
+      "discovery_commit": "3bbde7c",
+      "evidence": [
+        "Existing placeholder; E identity and actual business assets pending"
+      ],
+      "accepted_by": []
+    },
+    {
+      "resource_id": "self-archive-example",
+      "module_id": "integration-demo",
+      "locator": {
+        "kind": "directory",
+        "relative_location": "examples/self-archive"
+      },
+      "status": "proposed",
+      "discovery_commit": "3bbde7c",
+      "evidence": [
+        "Existing placeholder; root review snapshot is recorded separately and is not this Demo implementation"
+      ],
+      "accepted_by": []
+    },
+    {
+      "resource_id": "coordination-documents",
+      "module_id": "coordination-docs",
+      "locator": {
+        "kind": "directory",
+        "relative_location": "docs"
+      },
+      "status": "accepted",
+      "discovery_commit": "3bbde7c",
+      "evidence": [
+        "Existing SETUP and imported collaboration documents; user explicitly authorized T011 bootstrap migration, without assigning role E"
+      ],
+      "accepted_by": [
+        "Alvintxh: explicit-user role A and T011 migration authorization"
+      ]
+    },
+    {
+      "resource_id": "public-agent-rules",
+      "module_id": "coordination-docs",
+      "locator": {
+        "kind": "file",
+        "relative_location": "AGENTS.md"
+      },
+      "status": "accepted",
+      "discovery_commit": "3bbde7c",
+      "evidence": [
+        "T011 explicit-user bootstrap migration; collaboration template 0161b49 and existing project baseline 3bbde7c"
+      ],
+      "accepted_by": [
+        "Alvintxh: explicit-user T011 migration scope; role E remains unassigned"
+      ]
+    },
+    {
+      "resource_id": "claude-entry",
+      "module_id": "coordination-docs",
+      "locator": {
+        "kind": "file",
+        "relative_location": "CLAUDE.md"
+      },
+      "status": "accepted",
+      "discovery_commit": "3bbde7c",
+      "evidence": [
+        "T011 explicit-user bootstrap migration; collaboration template 0161b49 and existing project baseline 3bbde7c"
+      ],
+      "accepted_by": [
+        "Alvintxh: explicit-user T011 migration scope; role E remains unassigned"
+      ]
+    },
+    {
+      "resource_id": "project-readme",
+      "module_id": "coordination-docs",
+      "locator": {
+        "kind": "file",
+        "relative_location": "README.md"
+      },
+      "status": "accepted",
+      "discovery_commit": "3bbde7c",
+      "evidence": [
+        "T011 explicit-user bootstrap migration; collaboration template 0161b49 and existing project baseline 3bbde7c"
+      ],
+      "accepted_by": [
+        "Alvintxh: explicit-user T011 migration scope; role E remains unassigned"
+      ]
+    },
+    {
+      "resource_id": "collaboration-manifest",
+      "module_id": "coordination-docs",
+      "locator": {
+        "kind": "file",
+        "relative_location": "collaboration.json"
+      },
+      "status": "accepted",
+      "discovery_commit": "3bbde7c",
+      "evidence": [
+        "T011 explicit-user bootstrap migration; collaboration template 0161b49 and existing project baseline 3bbde7c"
+      ],
+      "accepted_by": [
+        "Alvintxh: explicit-user T011 migration scope; role E remains unassigned"
+      ]
+    },
+    {
+      "resource_id": "overview",
+      "module_id": "coordination-docs",
+      "locator": {
+        "kind": "file",
+        "relative_location": "协作方案.md"
+      },
+      "status": "accepted",
+      "discovery_commit": "3bbde7c",
+      "evidence": [
+        "T011 explicit-user bootstrap migration; collaboration template 0161b49 and existing project baseline 3bbde7c"
+      ],
+      "accepted_by": [
+        "Alvintxh: explicit-user T011 migration scope; role E remains unassigned"
+      ]
+    },
+    {
+      "resource_id": "layout_guidance",
+      "module_id": "coordination-docs",
+      "locator": {
+        "kind": "file",
+        "relative_location": "目录与分工建议.md"
+      },
+      "status": "accepted",
+      "discovery_commit": "3bbde7c",
+      "evidence": [
+        "T011 explicit-user bootstrap migration; collaboration template 0161b49 and existing project baseline 3bbde7c"
+      ],
+      "accepted_by": [
+        "Alvintxh: explicit-user T011 migration scope; role E remains unassigned"
+      ]
+    },
+    {
+      "resource_id": "git_workflow",
+      "module_id": "coordination-docs",
+      "locator": {
+        "kind": "file",
+        "relative_location": "GIT_WORKFLOW.md"
+      },
+      "status": "accepted",
+      "discovery_commit": "3bbde7c",
+      "evidence": [
+        "T011 explicit-user bootstrap migration; collaboration template 0161b49 and existing project baseline 3bbde7c"
+      ],
+      "accepted_by": [
+        "Alvintxh: explicit-user T011 migration scope; role E remains unassigned"
+      ]
+    },
+    {
+      "resource_id": "tasks",
+      "module_id": "coordination-docs",
+      "locator": {
+        "kind": "directory",
+        "relative_location": "tasks/"
+      },
+      "status": "accepted",
+      "discovery_commit": "3bbde7c",
+      "evidence": [
+        "T011 explicit-user bootstrap migration; collaboration template 0161b49 and existing project baseline 3bbde7c"
+      ],
+      "accepted_by": [
+        "Alvintxh: explicit-user T011 migration scope; role E remains unassigned"
+      ]
+    },
+    {
+      "resource_id": "collaboration-schemas",
+      "module_id": "coordination-docs",
+      "locator": {
+        "kind": "directory",
+        "relative_location": "schemas"
+      },
+      "status": "accepted",
+      "discovery_commit": "3bbde7c",
+      "evidence": [
+        "T011 explicit-user bootstrap migration; collaboration template 0161b49 and existing project baseline 3bbde7c"
+      ],
+      "accepted_by": [
+        "Alvintxh: explicit-user T011 migration scope; role E remains unassigned"
+      ]
+    },
+    {
+      "resource_id": "collaboration-templates",
+      "module_id": "coordination-docs",
+      "locator": {
+        "kind": "directory",
+        "relative_location": "templates"
+      },
+      "status": "accepted",
+      "discovery_commit": "3bbde7c",
+      "evidence": [
+        "T011 explicit-user bootstrap migration; collaboration template 0161b49 and existing project baseline 3bbde7c"
+      ],
+      "accepted_by": [
+        "Alvintxh: explicit-user T011 migration scope; role E remains unassigned"
+      ]
+    },
+    {
+      "resource_id": "collaboration-validator",
+      "module_id": "coordination-docs",
+      "locator": {
+        "kind": "file",
+        "relative_location": "scripts/validate_collaboration.py"
+      },
+      "status": "accepted",
+      "discovery_commit": "3bbde7c",
+      "evidence": [
+        "T011 explicit-user bootstrap migration; collaboration template 0161b49 and existing project baseline 3bbde7c"
+      ],
+      "accepted_by": [
+        "Alvintxh: explicit-user T011 migration scope; role E remains unassigned"
+      ]
+    },
+    {
+      "resource_id": "product_context",
+      "module_id": "coordination-docs",
+      "locator": {
+        "kind": "file",
+        "relative_location": "INFO.md"
+      },
+      "status": "accepted",
+      "discovery_commit": "3bbde7c",
+      "evidence": [
+        "T011 explicit-user bootstrap migration; collaboration template 0161b49 and existing project baseline 3bbde7c"
+      ],
+      "accepted_by": [
+        "Alvintxh: explicit-user T011 migration scope; role E remains unassigned"
+      ]
+    },
+    {
+      "resource_id": "backend-handoff",
+      "module_id": "capture-reconstruction",
+      "locator": {
+        "kind": "file",
+        "relative_location": "packages/mcp-adapters/BACKEND_HANDOFF.md"
+      },
+      "status": "accepted",
+      "discovery_commit": "3bbde7c",
+      "evidence": [
+        "Existing A delivery and handoff at 3bbde7c"
+      ],
+      "accepted_by": [
+        "Alvintxh: explicit-user role A and migration scope"
+      ]
+    },
+    {
+      "resource_id": "capture-readme",
+      "module_id": "capture-reconstruction",
+      "locator": {
+        "kind": "file",
+        "relative_location": "packages/mcp-adapters/README.md"
+      },
+      "status": "accepted",
+      "discovery_commit": "3bbde7c",
+      "evidence": [
+        "Existing A delivery and handoff at 3bbde7c"
+      ],
+      "accepted_by": [
+        "Alvintxh: explicit-user role A and migration scope"
+      ]
+    },
+    {
+      "resource_id": "self-archive-state-review",
+      "module_id": "capture-reconstruction",
+      "locator": {
+        "kind": "directory",
+        "relative_location": ".aica/review"
+      },
+      "status": "accepted",
+      "discovery_commit": "a1a9997ffd3037549f1b3a36c8bb4424e4e1bc79",
+      "evidence": [
+        "User explicitly requested sharing .aica state; offline SQLite backups and credential-redacted files prepared in this task"
+      ],
+      "accepted_by": [
+        "Alvintxh: explicit-user request to submit .aica files; review copies only"
+      ]
+    },
+    {
+      "resource_id": "self-archive-guide",
+      "module_id": "capture-reconstruction",
+      "locator": {
+        "kind": "file",
+        "relative_location": ".aica/README.md"
+      },
+      "status": "accepted",
+      "discovery_commit": "a1a9997ffd3037549f1b3a36c8bb4424e4e1bc79",
+      "evidence": [
+        "Existing authorized Self-Archive guide; updated to identify offline review copies and original runtime exclusions"
+      ],
+      "accepted_by": [
+        "Alvintxh: explicit-user request to submit .aica files"
+      ]
+    },
+    {
+      "resource_id": "self-archive-full-state",
+      "module_id": "capture-reconstruction",
+      "locator": {
+        "kind": "directory",
+        "relative_location": ".aica"
+      },
+      "status": "accepted",
+      "discovery_commit": "18f4cdae8f655480598a1efa3a6a3d8e104cda36",
+      "evidence": [
+        "User explicitly requested full original directory upload after being informed that raw credentials and WAL/SHM had been excluded; private target AiCA-Team/AiCA verified"
+      ],
+      "accepted_by": [
+        "Alvintxh: explicit-user full .aica state upload authorization for this snapshot"
+      ]
+    }
+  ],
+  "resources": {
+    "overview": "协作方案.md",
+    "product_context": "INFO.md",
+    "ownership": "docs/OWNERSHIP.md",
+    "discovery": "docs/DISCOVERY.md",
+    "workflow": "docs/WORKFLOW.md",
+    "handoff": "docs/HANDOFF.md",
+    "environment_policy": "docs/ENVIRONMENT.md",
+    "contracts": "docs/CONTRACTS.md",
+    "maintainers": "docs/MAINTAINERS.md",
+    "validation_contract": "docs/VALIDATION-CONTRACT.md",
+    "agent_adapters": "docs/ADAPTERS.md",
+    "tasks": "tasks/",
+    "task_template": "templates/task.json",
+    "manifest_schema": "schemas/collaboration.schema.json",
+    "task_schema": "schemas/task.schema.json",
+    "layout_guidance": "目录与分工建议.md",
+    "git_workflow": "GIT_WORKFLOW.md",
+    "role_onboarding": "docs/ROLE-ONBOARDING.md",
+    "repository-root": ".",
+    "setup-guide": "docs/SETUP.md",
+    "conda-environment": "environment.yml",
+    "python-requirements": "requirements.txt",
+    "python-tooling": "pyproject.toml",
+    "archive-package": "packages/schema",
+    "capture-package": "packages/mcp-adapters",
+    "protocol-schema": "packages/schema/src/aica_schema/aica.schema.json",
+    "recording-contract": "packages/schema/src/aica_schema/recording.schema.json",
+    "protocol-fixture": "packages/schema/tests/fixtures/branching.aica.json",
+    "backend-handoff": "packages/mcp-adapters/BACKEND_HANDOFF.md",
+    "preview-service": "apps/gateway/src/preview",
+    "artifact-components": "packages/artifact-renderers",
+    "web-application": "apps/web",
+    "runtime-package": "packages/runtime",
+    "gateway-application": "apps/gateway",
+    "comic-assets": "examples/ai-comic",
+    "self-archive-example": "examples/self-archive",
+    "coordination-documents": "docs",
+    "public-agent-rules": "AGENTS.md",
+    "claude-entry": "CLAUDE.md",
+    "project-readme": "README.md",
+    "collaboration-manifest": "collaboration.json",
+    "collaboration-validator": "scripts/validate_collaboration.py",
+    "collaboration-schemas": "schemas",
+    "collaboration-templates": "templates",
+    "capture-readme": "packages/mcp-adapters/README.md",
+    "migration-decision": "docs/COOP-MIGRATION.md",
+    "validation-report": "docs/DELIVERY-CHECK.md",
+    "self-archive-snapshot": "aica.json",
+    "self-archive-artifacts": ".aica/artifacts",
+    "self-archive-state-review": ".aica/review",
+    "self-archive-guide": ".aica/README.md",
+    "self-archive-full-state": ".aica",
+    "phase-status": "docs/STATUS.md"
+  },
+  "environment": {
+    "mode": "inherit-existing",
+    "reference_resource_id": "setup-guide",
+    "protected_resource_ids": [
+      "conda-environment",
+      "python-requirements",
+      "python-tooling"
+    ],
+    "command_refs": {
+      "preflight": "dependency-check",
+      "install": "install-local-packages",
+      "dev": null,
+      "build": null,
+      "test": "tests-all"
+    }
+  },
+  "commands": {
+    "schema-tests": {
+      "cwd_resource_id": "repository-root",
+      "argv": [
+        "python3",
+        "-m",
+        "pytest",
+        "-q",
+        "packages/schema/tests"
+      ]
+    },
+    "capture-tests": {
+      "cwd_resource_id": "repository-root",
+      "argv": [
+        "python3",
+        "-m",
+        "pytest",
+        "-q",
+        "packages/mcp-adapters/tests"
+      ]
+    },
+    "tests-all": {
+      "cwd_resource_id": "repository-root",
+      "argv": [
+        "python3",
+        "-m",
+        "pytest",
+        "-q"
+      ]
+    },
+    "lint-a": {
+      "cwd_resource_id": "repository-root",
+      "argv": [
+        "python3",
+        "-m",
+        "ruff",
+        "check",
+        "packages/schema",
+        "packages/mcp-adapters"
+      ]
+    },
+    "dependency-check": {
+      "cwd_resource_id": "repository-root",
+      "argv": [
+        "python3",
+        "-m",
+        "pip",
+        "check"
+      ]
+    },
+    "install-local-packages": {
+      "cwd_resource_id": "repository-root",
+      "argv": [
+        "python3",
+        "-m",
+        "pip",
+        "install",
+        "--no-build-isolation",
+        "-e",
+        "packages/schema",
+        "-e",
+        "packages/mcp-adapters"
+      ]
+    },
+    "validate-real-sample": {
+      "cwd_resource_id": "repository-root",
+      "argv": [
+        "aica",
+        "validate",
+        "aica.json"
+      ]
+    },
+    "validate-protocol-fixture": {
+      "cwd_resource_id": "repository-root",
+      "argv": [
+        "aica",
+        "validate",
+        "packages/schema/tests/fixtures/branching.aica.json"
+      ]
+    },
+    "collaboration-validation": {
+      "cwd_resource_id": "repository-root",
+      "argv": [
+        "python3",
+        "scripts/validate_collaboration.py"
+      ]
+    },
+    "diff-check": {
+      "cwd_resource_id": "repository-root",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ]
+    },
+    "coordination-style": {
+      "cwd_resource_id": "repository-root",
+      "argv": [
+        "python3",
+        "-m",
+        "ruff",
+        "check",
+        "scripts/validate_collaboration.py"
+      ]
+    },
+    "gateway-tests": {
+      "cwd_resource_id": "repository-root",
+      "argv": [
+        "python",
+        "-m",
+        "pytest",
+        "-q",
+        "-c",
+        "apps/gateway/pytest.ini",
+        "apps/gateway/tests"
+      ]
+    },
+    "gateway-style": {
+      "cwd_resource_id": "repository-root",
+      "argv": [
+        "python",
+        "-m",
+        "ruff",
+        "check",
+        "apps/gateway"
+      ]
+    },
+    "gateway-regression": {
+      "cwd_resource_id": "repository-root",
+      "argv": [
+        "python",
+        "-m",
+        "pytest",
+        "-q",
+        "-c",
+        "apps/gateway/pytest.ini",
+        "packages/schema/tests",
+        "packages/mcp-adapters/tests",
+        "apps/gateway/tests"
+      ]
+    },
+    "semantic-tests": {
+      "cwd_resource_id": "repository-root",
+      "argv": [
+        "python",
+        "-m",
+        "pytest",
+        "-q",
+        "-c",
+        "apps/gateway/pytest.ini",
+        "packages/runtime/tests",
+        "apps/gateway/tests"
+      ]
+    },
+    "semantic-style": {
+      "cwd_resource_id": "repository-root",
+      "argv": [
+        "python",
+        "-m",
+        "ruff",
+        "check",
+        "packages/runtime",
+        "apps/gateway"
+      ]
+    },
+    "semantic-regression": {
+      "cwd_resource_id": "repository-root",
+      "argv": [
+        "python",
+        "-m",
+        "pytest",
+        "-q",
+        "-c",
+        "apps/gateway/pytest.ini",
+        "packages/schema/tests",
+        "packages/mcp-adapters/tests",
+        "packages/runtime/tests",
+        "apps/gateway/tests"
+      ]
+    },
+    "web-tests": {
+      "cwd_resource_id": "web-application",
+      "argv": [
+        "npm",
+        "test"
+      ]
+    },
+    "web-build": {
+      "cwd_resource_id": "web-application",
+      "argv": [
+        "npm",
+        "run",
+        "build"
+      ]
+    },
+    "mcp-upgrade-tests": {
+      "cwd_resource_id": "repository-root",
+      "argv": [
+        "python",
+        "-m",
+        "pytest",
+        "-q",
+        "-c",
+        "apps/gateway/pytest.ini",
+        "apps/gateway/tests/test_mcp_upgrade.py",
+        "apps/gateway/tests/test_platform_api.py::test_request_document_has_no_legacy_five_mib_limit"
+      ]
+    },
+    "graph-autosave-tests": {
+      "cwd_resource_id": "repository-root",
+      "argv": [
+        "python",
+        "-m",
+        "pytest",
+        "-q",
+        "-c",
+        "apps/gateway/pytest.ini",
+        "apps/gateway/tests/test_graph_autosave.py"
+      ]
+    },
+    "module-content-tests": {
+      "cwd_resource_id": "repository-root",
+      "argv": [
+        "python",
+        "-m",
+        "pytest",
+        "-q",
+        "-c",
+        "apps/gateway/pytest.ini",
+        "apps/gateway/tests/test_module_pages.py",
+        "apps/gateway/tests/test_graph_autosave.py"
+      ]
+    }
+  },
+  "checks": {
+    "archive-contract": {
+      "command_ref": "schema-tests",
+      "status": "connected"
+    },
+    "capture-reconstruction": {
+      "command_ref": "capture-tests",
+      "status": "connected"
+    },
+    "preview-execution": {
+      "command_ref": null,
+      "status": "unconnected"
+    },
+    "artifact-presentation": {
+      "command_ref": null,
+      "status": "unconnected"
+    },
+    "graph-application": {
+      "command_ref": null,
+      "status": "unconnected"
+    },
+    "graph-runtime": {
+      "command_ref": "semantic-tests",
+      "status": "connected"
+    },
+    "platform-api": {
+      "command_ref": "gateway-tests",
+      "status": "connected"
+    },
+    "demo-assets": {
+      "command_ref": null,
+      "status": "unconnected"
+    },
+    "integration-demo": {
+      "command_ref": null,
+      "status": "unconnected"
+    },
+    "coordination-docs": {
+      "command_ref": "collaboration-validation",
+      "status": "connected"
+    },
+    "a-regression": {
+      "command_ref": "tests-all",
+      "status": "connected"
+    },
+    "a-style": {
+      "command_ref": "lint-a",
+      "status": "connected"
+    },
+    "environment-integrity": {
+      "command_ref": "dependency-check",
+      "status": "connected"
+    },
+    "review-sample": {
+      "command_ref": "validate-real-sample",
+      "status": "connected"
+    },
+    "protocol-fixture": {
+      "command_ref": "validate-protocol-fixture",
+      "status": "connected"
+    },
+    "whitespace": {
+      "command_ref": "diff-check",
+      "status": "connected"
+    },
+    "coordination-style": {
+      "command_ref": "coordination-style",
+      "status": "connected"
+    },
+    "gateway-style": {
+      "command_ref": "gateway-style",
+      "status": "connected"
+    },
+    "gateway-regression": {
+      "command_ref": "gateway-regression",
+      "status": "connected"
+    },
+    "semantic-style": {
+      "command_ref": "semantic-style",
+      "status": "connected"
+    },
+    "semantic-regression": {
+      "command_ref": "semantic-regression",
+      "status": "connected"
+    },
+    "web-tests": {
+      "command_ref": "web-tests",
+      "status": "connected"
+    },
+    "web-build": {
+      "command_ref": "web-build",
+      "status": "connected"
+    },
+    "mcp-upgrade": {
+      "command_ref": "mcp-upgrade-tests",
+      "status": "connected"
+    },
+    "graph-autosave": {
+      "command_ref": "graph-autosave-tests",
+      "status": "connected"
+    },
+    "module-content": {
+      "command_ref": "module-content-tests",
+      "status": "connected"
+    }
+  },
+  "bootstrap": {
+    "state": "partially-bound-awaiting-integration",
+    "discovery_commit": "3bbde7c",
+    "accepted_by": [
+      "Alvintxh: explicit-user selection 1 in current conversation"
+    ],
+    "template_source_commit": "0161b4997673c21e4e41e093805c1a2c83f4b6d8",
+    "migration_task_id": "T011",
+    "authorization_scope": "Import collaboration rules and map existing resources in a dedicated migration branch; no role reassignment or environment change",
+    "decision_resource_id": "migration-decision",
+    "enforcement": "Local structure/reference checks only; remote CI and branch protections not verified"
+  },
+  "branch_policy": {
+    "claim_authority": "accepted-integration-branch",
+    "requires_up_to_date_or_serial_merge": true,
+    "role_confirmation_required": true,
+    "task_branch_required": true,
+    "direct_push_to_shared_branches_allowed": false,
+    "unfinished_push_to_task_branch_allowed": true,
+    "pr_required_for_integration": true,
+    "base_selection": "inherit-existing-repository-policy",
+    "naming": "feature/<role>-<task>",
+    "shared_branches": [
+      "main",
+      "dev",
+      "agent_coop"
+    ],
+    "integration_target": "dev",
+    "remote": "origin",
+    "migration_base": "feature/a-protocol-mcp@3bbde7c",
+    "migration_integration_order": "PR #1 into dev first, then migration PR into dev; stacked review targets feature/a-protocol-mcp until then"
+  }
+}

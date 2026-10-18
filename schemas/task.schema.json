@@ -1,0 +1,480 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agent task and handoff record",
+  "type": "object",
+  "required": [
+    "version",
+    "task_id",
+    "title",
+    "owner_role",
+    "owner",
+    "agent_session",
+    "status",
+    "scope",
+    "depends_on",
+    "acceptance",
+    "required_check_refs",
+    "branch",
+    "base_commit",
+    "checkpoint_commit",
+    "updated_at",
+    "summary",
+    "completed",
+    "remaining",
+    "next_steps",
+    "evidence",
+    "artifacts",
+    "risks",
+    "blockers",
+    "history",
+    "merge_evidence",
+    "demo_evidence",
+    "role_confirmation"
+  ],
+  "properties": {
+    "version": {
+      "const": "2.0"
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "owner_role": {
+      "enum": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E"
+      ]
+    },
+    "owner": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "agent_session": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "status": {
+      "enum": [
+        "planned",
+        "ready",
+        "claimed",
+        "in_progress",
+        "blocked",
+        "handoff",
+        "in_review",
+        "integrated",
+        "demo_verified"
+      ]
+    },
+    "scope": {
+      "type": "object",
+      "required": [
+        "module_ids",
+        "resource_ids"
+      ],
+      "properties": {
+        "module_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "resource_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "acceptance": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "required_check_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "branch": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "base_commit": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "checkpoint_commit": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "updated_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "depends_on": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "completed": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "remaining": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "risks": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "blockers": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "next_steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "module_id",
+          "resource_id",
+          "command_ref",
+          "action"
+        ],
+        "properties": {
+          "module_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "resource_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "command_ref": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "action": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "check_ref",
+          "command_ref",
+          "tested_commit",
+          "result",
+          "mode",
+          "artifact_ref"
+        ],
+        "properties": {
+          "check_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "command_ref": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "tested_commit": {
+            "type": "string",
+            "minLength": 1
+          },
+          "result": {
+            "enum": [
+              "passed",
+              "failed",
+              "not_run"
+            ]
+          },
+          "mode": {
+            "enum": [
+              "real",
+              "fixture",
+              "cache",
+              "static"
+            ]
+          },
+          "artifact_ref": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "from",
+          "to",
+          "at",
+          "actor",
+          "reason"
+        ],
+        "properties": {
+          "from": {
+            "type": "string",
+            "minLength": 1
+          },
+          "to": {
+            "type": "string",
+            "minLength": 1
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "actor": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "artifacts": {
+      "type": "array"
+    },
+    "demo_evidence": {
+      "type": "array"
+    },
+    "merge_evidence": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "role_confirmation": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "confirmed_by": {
+          "type": "string",
+          "minLength": 1
+        },
+        "confirmed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "source": {
+          "enum": [
+            "explicit-user",
+            "accepted-role-map",
+            "maintainer"
+          ]
+        },
+        "reference": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "confirmed_by",
+        "confirmed_at",
+        "source",
+        "reference"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "claimed",
+              "in_progress",
+              "blocked",
+              "handoff",
+              "in_review",
+              "integrated",
+              "demo_verified"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "owner": {
+            "type": "string",
+            "minLength": 1
+          },
+          "agent_session": {
+            "type": "string",
+            "minLength": 1
+          },
+          "branch": {
+            "type": "string",
+            "minLength": 1
+          },
+          "base_commit": {
+            "type": "string",
+            "minLength": 1
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "role_confirmation": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "blocked"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "blockers": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "in_review",
+              "integrated",
+              "demo_verified"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "remaining": {
+            "maxItems": 0
+          },
+          "blockers": {
+            "maxItems": 0
+          },
+          "evidence": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "integrated",
+              "demo_verified"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "merge_evidence": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "demo_verified"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "demo_evidence": {
+            "minItems": 1
+          }
+        }
+      }
+    }
+  ]
+}

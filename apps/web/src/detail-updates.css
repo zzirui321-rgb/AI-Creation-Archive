@@ -1,0 +1,20 @@
+.masonry-gallery{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px;column-count:auto;align-items:stretch}
+.masonry-gallery>.project-card{margin:0;min-width:0;display:flex;flex-direction:column;break-inside:auto}
+.masonry-gallery .project-cover{height:auto!important;aspect-ratio:5/4;flex-shrink:0}
+.masonry-gallery .project-card-content{flex:1;display:flex;flex-direction:column}
+.masonry-gallery .card-tools{margin-bottom:16px}
+.masonry-gallery .card-bottom{margin-top:auto}
+.module-detail-dialog{position:fixed;width:min(790px,calc(100vw - 40px));max-width:none;max-height:88dvh;box-sizing:border-box;padding:28px;margin:auto;overflow:auto;overscroll-behavior:contain;border-radius:23px;background:linear-gradient(140deg,#223c51f5,#152b3ff7);border:1px solid #98bbce66;box-shadow:0 28px 100px #0009;backdrop-filter:blur(26px) saturate(120%);color:#c9e3ef}
+.module-detail-dialog::backdrop{background:#020b15b8;backdrop-filter:blur(6px)}
+.module-detail-dialog>header{border-bottom:1px solid #96b4c12e;padding-bottom:19px}
+.module-detail-dialog .prompt-section-heading{margin-top:22px}
+.module-detail-dialog .prompt-words{max-height:260px;font-size:16px}
+.module-detail-dialog .module-facts{margin-top:26px;padding-top:22px;border-top:1px solid #9ab6c32e}
+.module-detail-dialog .module-detail-grid{grid-template-columns:1fr 1fr;margin-top:17px}
+.module-detail-dialog>.button{margin-top:4px}.module-detail-dialog :focus-visible{outline:2px solid #abd7e7;outline-offset:3px}
+@media(max-width:1100px){.masonry-gallery{grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}}
+@media(max-width:800px){.masonry-gallery{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}}
+@media(max-width:600px){.masonry-gallery{gap:12px}.module-detail-dialog{width:calc(100vw - 24px);max-height:90dvh;padding:22px 17px;border-radius:20px}.module-detail-dialog h2{font-size:22px}.module-detail-dialog .prompt-section-heading{margin-top:19px}.module-detail-dialog .prompt-words{font-size:16px;max-height:230px;line-height:2}.module-detail-dialog .module-detail-grid{grid-template-columns:1fr}.module-detail-dialog .module-facts{margin-top:23px}}
+@media(max-width:360px){.masonry-gallery{grid-template-columns:minmax(0,1fr)}}
+@media(prefers-reduced-transparency:reduce){.module-detail-dialog{background:#1b3347;backdrop-filter:none}.module-detail-dialog::backdrop{backdrop-filter:none}}
+@media(prefers-contrast:more){.module-detail-dialog{border-color:#a7c4d7}}

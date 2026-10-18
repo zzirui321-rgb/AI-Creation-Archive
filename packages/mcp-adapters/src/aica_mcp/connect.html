@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>连接项目 · AiCA</title>
+  <style>
+    :root{color-scheme:light;--ink:#172b35;--paper:#f6f3eb;--accent:#ac502d;--muted:#68756f;--line:#d9ddd3}
+    *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.65 "Avenir Next","PingFang SC",sans-serif}
+    main{max-width:1000px;margin:8vh auto;padding:32px;display:grid;grid-template-columns:1fr 1.25fr;gap:70px}
+    .brand{font-size:22px;font-weight:700;letter-spacing:.08em}.brand span{color:var(--accent)}
+    h1{font:normal clamp(32px,4vw,48px)/1.25 "Iowan Old Style","Songti SC",serif;margin:64px 0 24px}h2{font-size:24px;margin:0 0 22px}
+    .intro{color:var(--muted);max-width:290px}.context{margin-top:42px;border-top:1px solid var(--line);padding-top:18px;font-size:14px;overflow-wrap:anywhere}
+    .context p{margin:6px 0}.label{color:var(--muted)}.panel{background:#fffef9;border:1px solid var(--line);border-radius:16px;padding:36px;box-shadow:0 18px 60px #172b3509}
+    .steps{display:flex;gap:24px;font-size:13px;color:var(--muted);margin-bottom:30px}.current{color:var(--accent);font-weight:700}
+    label{display:block;font-size:14px;margin-bottom:18px}input,select{font:inherit;width:100%;margin-top:8px;padding:11px 12px;border:1px solid #bec8bf;border-radius:7px;background:white;color:var(--ink)}
+    input:focus,select:focus,button:focus-visible{outline:3px solid #ac502d55;outline-offset:2px}button{font:inherit;cursor:pointer;border:0;border-radius:7px;padding:12px 16px}
+    button[type=submit]{background:var(--ink);color:white;width:100%;margin-top:12px}button:disabled{opacity:.55;cursor:wait}.cancel{background:transparent;color:var(--muted);width:100%;margin-top:8px}
+    .grant{display:flex;align-items:flex-start;gap:10px;margin:26px 0 8px}.grant input{width:auto;margin-top:6px;accent-color:var(--accent)}.grant span{flex:1}.fine{font-size:13px;color:var(--muted)}
+    #error{color:#963b22;background:#fff1e7;border-radius:7px;padding:10px 14px;margin:0 0 18px;overflow-wrap:anywhere}#success{border-top:3px solid #567966;padding-top:22px}
+    [hidden]{display:none!important}code{font-size:14px;background:#edf0e9;padding:3px 6px;border-radius:4px}.busy{opacity:.65}
+    @media(max-width:720px){main{margin:0 auto;padding:26px 20px;grid-template-columns:1fr;gap:25px}h1{margin:28px 0 14px}.intro{max-width:none}.context{margin-top:22px}.panel{padding:26px}}
+  </style>
+  <script src="/connect.js" defer></script>
+</head>
+<body>
+<main>
+  <section aria-label="项目连接说明">
+    <div class="brand">AiCA<span> / </span>CONNECT</div>
+    <h1>连接你的<br>创作项目。</h1>
+    <p class="intro">登录、选择项目、确认一次。之后的记录、产物登记与上传，自动衔接。</p>
+    <div class="context">
+      <p><span class="label">本地项目</span><br><strong id="workspace">正在读取…</strong></p>
+      <p><span class="label">平台地址</span><br><span id="server"></span></p>
+      <p id="archive" class="fine"></p>
+    </div>
+  </section>
+  <section class="panel" aria-label="登录并授权">
+    <div class="steps"><span id="step-login" class="current">01 / 登录</span><span id="step-project">02 / 项目授权</span></div>
+    <p id="error" role="alert" hidden></p>
+    <form id="login" hidden>
+      <h2>登录平台账号</h2>
+      <label>用户名<input name="username" autocomplete="username" required maxlength="1024"></label>
+      <label>密码<input name="password" type="password" autocomplete="current-password" required maxlength="1024"></label>
+      <p class="fine">密码仅用于本次登录，不在本机保存。凭证由 AiCA 私有保存，无需复制。</p>
+      <button type="submit">登录并选择项目 →</button>
+    </form>
+    <form id="project" hidden>
+      <h2>把记录保存到哪里？</h2>
+      <label>平台项目<select name="project_id"><option value="">新建项目</option></select></label>
+      <label id="title-field">新项目名称<input name="title" maxlength="200" required></label>
+      <label class="grant"><input name="sync_enabled" type="checkbox" checked><span>启用自动双向同步，并更新已登记附件对应的本地文件。两端同时修改时暂停并提示选择。</span></label>
+      <label id="repo-field">平台作品<select name="repo_id"><option value="">新建同步作品</option></select><span class="fine">同步已有修改时，请选择你正在平台编辑的作品。</span></label>
+      <label class="grant"><input name="confirm_project" type="checkbox" required><span>允许本地项目的已有档案及后续需求、可见回复和可关联工具记录自动上传到所选项目；允许登记本次任务生成或我选定的附件。</span></label>
+      <p class="fine">授权跨会话保存，不扫描整个目录。双向同步会先备份，再更新已登记文件；同名未登记文件或两端修改会触发冲突。可随时暂停或断开；历史导入与公开发布仍需另行确认。</p>
+      <button type="submit">授权并连接项目 →</button>
+    </form>
+    <button id="cancel" class="cancel" type="button" hidden>取消，保持原有设置</button>
+    <div id="success" role="status" hidden><h2>项目已连接。</h2><p>后续按项目授权自动记录、登记产物并同步。启用双向同步时，平台修改也会更新本地；冲突时暂停并保留两端。可以关闭此页，继续创作。</p><p class="fine">暂停：<code>aica pause</code><br>恢复：<code>aica resume</code><br>撤销本机授权：<code>aica disconnect</code></p><p class="fine">凭证过期时，再运行 <code>aica connect</code> 登录。</p></div>
+  </section>
+</main>
+</body>
+</html>

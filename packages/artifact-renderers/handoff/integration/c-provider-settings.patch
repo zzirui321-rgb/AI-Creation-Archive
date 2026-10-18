@@ -1,0 +1,749 @@
+diff --git a/apps/web/package-lock.json b/apps/web/package-lock.json
+index 6576b25..f08ed9b 100644
+--- a/apps/web/package-lock.json
++++ b/apps/web/package-lock.json
+@@ -8,6 +8,7 @@
+       "name": "@aica/web",
+       "version": "0.1.0",
+       "dependencies": {
++        "@aica/artifact-renderers": "file:../../packages/artifact-renderers",
+         "@xyflow/react": "^12.4.4",
+         "lucide-react": "^0.468.0",
+         "react": "^19.0.0",
+@@ -22,6 +23,40 @@
+         "vitest": "^3.0.5"
+       }
+     },
++    "../../packages/artifact-renderers": {
++      "name": "@aica/artifact-renderers",
++      "version": "0.1.0",
++      "dependencies": {
++        "lucide-react": "^0.468.0",
++        "react-markdown": "^10.1.0",
++        "remark-gfm": "^4.0.1"
++      },
++      "devDependencies": {
++        "@testing-library/react": "^16.0.0",
++        "@testing-library/user-event": "^14.0.0",
++        "@types/node": "^24.0.0",
++        "@types/react": "^19.0.0",
++        "@types/react-dom": "^19.0.0",
++        "@vitejs/plugin-react": "^4.4.0",
++        "@xyflow/react": "^12.12.0",
++        "jsdom": "^26.0.0",
++        "json-schema-to-typescript": "^15.0.4",
++        "playwright": "^1.55.0",
++        "react": "^19.0.0",
++        "react-dom": "^19.0.0",
++        "typescript": "^5.9.0",
++        "vite": "^6.3.0",
++        "vitest": "^3.2.0"
++      },
++      "peerDependencies": {
++        "react": ">=18",
++        "react-dom": ">=18"
++      }
++    },
++    "node_modules/@aica/artifact-renderers": {
++      "resolved": "../../packages/artifact-renderers",
++      "link": true
++    },
+     "node_modules/@babel/code-frame": {
+       "version": "7.29.7",
+       "resolved": "https://registry.npmjs.org/@babel/code-frame/-/code-frame-7.29.7.tgz",
+diff --git a/apps/web/package.json b/apps/web/package.json
+index 341e6c6..0321287 100644
+--- a/apps/web/package.json
++++ b/apps/web/package.json
+@@ -10,6 +10,7 @@
+     "test": "vitest run"
+   },
+   "dependencies": {
++    "@aica/artifact-renderers": "file:../../packages/artifact-renderers",
+     "@xyflow/react": "^12.4.4",
+     "lucide-react": "^0.468.0",
+     "react": "^19.0.0",
+diff --git a/apps/web/src/App.tsx b/apps/web/src/App.tsx
+index bec7237..9efc5c1 100644
+--- a/apps/web/src/App.tsx
++++ b/apps/web/src/App.tsx
+@@ -15,9 +15,11 @@ const ShareDialog = lazy(() => import('./ShareDialog'));
+ const LoginPage = lazy(() => import('./LoginPage'));
+ const SettingsPage = lazy(() => import('./SettingsPage'));
+ const ImportPage = lazy(() => import('./ImportPage'));
++const ExecutableWorkspace = lazy(() => import('./ExecutableWorkspace'));
+ 
+ function routeId() {
+   const hash = window.location.hash;
++  const executable = hash.match(/^#\/execute(?:\/([a-zA-Z0-9_.:-]+))?$/); if (executable) return `execute:${executable[1] || ''}`;
+   const simple = hash.match(/^#\/(login|creations|saved|settings|new)$/); if (simple) return simple[1];
+   const work = hash.match(/^#\/(?:works|remix)\/([^/]+)$/); if (work) return work[1];
+   return hash === '#/' || !hash ? null : 'not-found';
+@@ -88,7 +90,8 @@ export default function App() {
+   return <div className="site-shell"><a className="skip-link" href="#main-content" onClick={e => { e.preventDefault(); document.getElementById('main-content')?.focus(); }}>跳到主要内容</a>
+     <header className="site-header"><a className="site-brand" href="#/" aria-label="AiCA 首页"><span className="site-logo"><GitBranch size={22} /></span>AiCA<span className="site-brand-dot">.</span></a><span className="header-separator" /><nav aria-label="主导航"><button className={!route ? 'active' : ''} onClick={() => explore()}>发现<span className="nav-dot" /></button><button className={isCreations ? 'active' : ''} onClick={() => { window.location.hash = '/creations'; }}>我的创造{localProjects.length > 0 && <span className="nav-count">{localProjects.length}</span>}<span className="nav-dot" /></button><button className={savedOnly ? 'active' : ''} onClick={() => explore(true)}>我的收藏{saved.length > 0 && <span className="nav-count">{saved.length}</span>}<span className="nav-dot" /></button></nav><div className="site-header-right"><span className="local-status"><i />LAN PLATFORM</span><a className="github-link" href="https://github.com/AiCA-Team/AiCA" target="_blank" rel="noreferrer">GitHub<ArrowUpRight size={13} /></a><button className="header-create" onClick={() => { window.location.hash = '/new'; }}><Plus size={15} /><span>开始创作</span></button><div className="account-control"><button className="user-orb" aria-label="账户菜单" aria-expanded={accountMenu} onClick={() => setAccountMenu(!accountMenu)}>{(session?.name ?? settings.displayName).slice(0, 1).toUpperCase()}</button>{accountMenu && <div className="account-menu"><strong>{session?.name ?? settings.displayName}</strong><span>{session ? `平台账号 · ${session.username}` : '访客 · 公开创作空间'}</span><button onClick={() => { window.location.hash = '/creations'; setAccountMenu(false); }}><Layers3 size={14} />我的创造</button><button onClick={() => { window.location.hash = '/settings'; setAccountMenu(false); }}><Settings2 size={14} />我的设置</button>{session ? <button onClick={() => void logout()}><LogOut size={14} />退出平台账号</button> : <button onClick={() => { setAccountMenu(false); login(); }}><LogIn size={14} />登录平台账号</button>}</div>}</div>{!session && <button className="login-entry" onClick={login}><LogIn size={15} /><span>登录</span></button>}</div></header>
+     <div id="main-content" tabIndex={-1}><Suspense fallback={<section className="page-loading" role="status"><span />正在打开创作空间…</section>}>
+-    {route === 'login' ? <LoginPage onBack={home} onSuccess={next => { setSession(next); window.location.hash = loginReturn.current; }} /> : route === 'settings' ? <SettingsPage settings={settings} credentials={credentials} onSave={applySettings} /> : route === 'new' ? <ImportPage onParsed={next => { const updated = [next, ...localRef.current.filter(p => p.id !== next.id)]; localRef.current = updated; setLocalProjects(updated); openProject(next.id); }} author={session?.name ?? settings.displayName} onImport={async next => { const created = await saveProject(next); openProject(created.id); }} /> : isCollection ? <>
++    <a className="button" href="#/execute">可执行档案 · Import / Fork / Replay</a>
++    {route?.startsWith('execute:') ? <ExecutableWorkspace projectId={route.slice(8)} settings={settings} credentials={credentials} /> : route === 'login' ? <LoginPage onBack={home} onSuccess={next => { setSession(next); window.location.hash = loginReturn.current; }} /> : route === 'settings' ? <SettingsPage settings={settings} credentials={credentials} onSave={applySettings} /> : route === 'new' ? <ImportPage onParsed={next => { const updated = [next, ...localRef.current.filter(p => p.id !== next.id)]; localRef.current = updated; setLocalProjects(updated); openProject(next.id); }} author={session?.name ?? settings.displayName} onImport={async next => { const created = await saveProject(next); openProject(created.id); }} /> : isCollection ? <>
+       {!isCreations && !savedOnly && <Hero explore={explore} openProject={openProject} />}
+       {(isCreations || savedOnly) && <section className="collection-banner"><div className="kicker"><span />{isCreations ? 'YOUR CREATIVE SPACE' : 'YOUR INSPIRATION LIBRARY'}</div><h1>{isCreations ? '每次创造，都有下一章。' : '喜欢的灵感，留在这里。'}</h1><p>{isCreations ? '继承一份灵感，也记录自己的开始。原创、Fork 与草稿，都在这里。' : '收藏作品的过程，找到下一次创作的起点。'}</p><div className="collection-summary"><span><strong>{isCreations ? localProjects.length : saved.length}</strong>{isCreations ? '份平台创作' : '个本地收藏'}</span><span className="collection-scope">平台数据库保存 · 局域网账号隔离</span></div>{isCreations && <div className="creation-entry-grid"><a href="#/new"><span><UploadCloud size={23} /></span><div><strong>上传我的创作记录</strong><p>从 MCP 解析文件生成自己的 Graph</p></div><ArrowUpRight size={19} /></a><button onClick={() => explore()}><span><GitBranch size={23} /></span><div><strong>从别人的灵感开始</strong><p>发现作品，Fork 后继续创作</p></div><ArrowUpRight size={19} /></button></div>}</section>}
+       <section className="community-section" ref={exploreRef} aria-labelledby="community-title"><div className="community-heading"><div><div className="kicker"><span />THE CREATIVE COMMONS</div><h2 id="community-title">{isCreations ? '我的创造' : savedOnly ? '我的收藏' : '灵感不止于此'}<span>Explore the possibilities.</span></h2><p>{isCreations ? '保存每一步，也保留继续改变的可能。' : savedOnly ? '留在本机的喜欢，等待下一次继续。' : '发现作品背后的过程，让别人的终点成为你的起点。'}</p></div><label className="community-search"><Search size={16} /><input aria-label="搜索社区作品" value={query} onChange={e => setQuery(e.target.value)} placeholder="搜索作品、创作者、工具…" />{query ? <button aria-label="清空搜索" onClick={() => setQuery('')}><X size={14} /></button> : <Command size={13} />}</label></div>
+diff --git a/apps/web/src/ExecutableWorkspace.tsx b/apps/web/src/ExecutableWorkspace.tsx
+new file mode 100644
+index 0000000..7a81df2
+--- /dev/null
++++ b/apps/web/src/ExecutableWorkspace.tsx
+@@ -0,0 +1,115 @@
++import { useEffect, useMemo, useRef, useState } from 'react';
++import { ArrowLeft, Play, GitBranch, Upload, RefreshCw, Square } from 'lucide-react';
++import { ArchiveClient, variableFields, operationValue, loadArchiveAssets, primaryArtifacts, ArtifactRenderer, ArchiveDiffViewer, ProvenanceAndLinksBar, latestRuns, type ArchiveSnapshot, type RuntimePlan, type VariableOperation, type RuntimeJob } from '@aica/artifact-renderers';
++import '@aica/artifact-renderers/styles.css';
++import GraphExplorer from './GraphExplorer';
++import { parseWorkflow } from './workflow';
++import './executable.css';
++import SemanticReview from './SemanticReview';
++import { imageProviderConfig, type AppSettings, type ModelCredentials } from './settings';
++
++const api = new ArchiveClient(globalThis.fetch.bind(globalThis), '/runtime-api');
++type Assets = Awaited<ReturnType<typeof loadArchiveAssets>>;
++
++export default function ExecutableWorkspace({ projectId = '', settings, credentials }: { projectId?: string; settings: AppSettings; credentials: ModelCredentials }) {
++  const imageConfig = useMemo(() => imageProviderConfig(settings, credentials), [settings, credentials]);
++  const [projects, setProjects] = useState<{ id: string; title: string }[]>([]);
++  const [snapshot, setSnapshot] = useState<ArchiveSnapshot>();
++  const [plan, setPlan] = useState<RuntimePlan>();
++  const [golden, setGolden] = useState<string[]>([]);
++  const [assets, setAssets] = useState<Assets>();
++  const [assetSnapshot, setAssetSnapshot] = useState('');
++  const [original, setOriginal] = useState<ArchiveSnapshot>();
++  const [originalAssets, setOriginalAssets] = useState<Assets>();
++  const [originalAssetId, setOriginalAssetId] = useState('');
++  const [edits, setEdits] = useState<Record<string, { mode: VariableOperation['mode']; text: string }>>({});
++  const [stage, setStage] = useState<'draft' | 'final'>('draft');
++  const [selected, setSelected] = useState<string | null>(null);
++  const [compare, setCompare] = useState(false);
++  const [executeConsent, setExecuteConsent] = useState(false);
++  const [recordConsent, setRecordConsent] = useState(false);
++  const [job, setJob] = useState<RuntimeJob>();
++  const [busy, setBusy] = useState(false);
++  const [error, setError] = useState('');
++  const [message, setMessage] = useState('');
++  const [epoch, setEpoch] = useState(0);
++  const request = useRef<AbortController | undefined>(undefined);
++  const archive = assetSnapshot === snapshot?.archive_id ? assets?.archive : undefined;
++  const comparison = originalAssetId === original?.archive_id ? originalAssets : undefined;
++  const running = !!job && ['queued', 'running'].includes(job.state);
++  const workflow = useMemo(() => snapshot ? { ...parseWorkflow(JSON.stringify(snapshot.archive)).workflow, goldenPath: golden } : undefined, [snapshot, golden]);
++  useEffect(() => {
++    const abort = new AbortController();
++    api.projects(abort.signal).then(result => { if (!abort.signal.aborted) setProjects(result.projects); }).catch(reason => { if (!abort.signal.aborted) setError(reason.message); });
++    return () => abort.abort();
++  }, [epoch, projectId]);
++  useEffect(() => {
++    const abort = new AbortController();
++    setSnapshot(undefined); setAssets(undefined); setOriginal(undefined); setOriginalAssets(undefined); setEdits({}); setJob(undefined); setCompare(false); setSelected(null); setPlan(undefined); setError('');
++    if (projectId) api.snapshot(projectId, undefined, abort.signal).then(value => { if (!abort.signal.aborted) setSnapshot(value); }).catch(reason => { if (!abort.signal.aborted) setError(reason.message); });
++    return () => { abort.abort(); request.current?.abort(); };
++  }, [projectId, epoch]);
++  useEffect(() => {
++    if (!snapshot || !projectId) return;
++    const abort = new AbortController(); let loaded: Assets | undefined;
++    setAssets(undefined); setPlan(undefined);
++    loadArchiveAssets(api, projectId, snapshot.archive, abort.signal).then(value => { loaded = value; if (abort.signal.aborted) value.dispose(); else { setAssets(value); setAssetSnapshot(snapshot.archive_id); } }).catch(reason => { if (!abort.signal.aborted) setError(reason.message); });
++    api.plan(projectId, snapshot.archive_id, stage, abort.signal, imageConfig).then(value => { if (!abort.signal.aborted) setPlan(value); }).catch(reason => { if (!abort.signal.aborted) setError(reason.message); });
++    api.goldenPath(projectId, snapshot.archive_id, abort.signal).then(value => { if (!abort.signal.aborted) setGolden(value.node_ids); }).catch(reason => { if (!abort.signal.aborted) setError(reason.message); });
++    return () => { abort.abort(); loaded?.dispose(); };
++  }, [snapshot, projectId, stage, imageConfig]);
++  useEffect(() => {
++    if (!original) return;
++    const abort = new AbortController(); let loaded: Assets | undefined;
++    loadArchiveAssets(api, projectId, original.archive, abort.signal).then(value => { loaded = value; if (abort.signal.aborted) value.dispose(); else { setOriginalAssets(value); setOriginalAssetId(original.archive_id); } }).catch(reason => { if (!abort.signal.aborted) setError(reason.message); });
++    return () => { abort.abort(); loaded?.dispose(); };
++  }, [original, projectId]);
++  async function act(action: (signal: AbortSignal) => Promise<void>) {
++    if (busy || running) return;
++    const abort = new AbortController(); request.current = abort; setBusy(true); setError('');
++    try { await action(abort.signal); } catch (reason) { if (!abort.signal.aborted) setError(reason instanceof Error ? reason.message : '请求失败'); }
++    finally { if (request.current === abort) { request.current = undefined; setBusy(false); } }
++  }
++  async function run(signal: AbortSignal) {
++    if (!snapshot || !executeConsent || !recordConsent) return;
++    const needsImages = snapshot.archive.graph.nodes.some(node => ['image_gen', 'image-provider'].includes(node.execution?.tool || ''));
++    if (needsImages && !imageConfig) throw new Error('请先在模型设置中填写生图 API Key，或明确选择 Local Fallback 离线预览。');
++    const accepted = await api.execute(projectId, snapshot, stage, signal, imageConfig);
++    for (;;) {
++      const { execution } = await api.job(projectId, accepted.job_id, signal);
++      if (signal.aborted) return;
++      if (!['queued', 'running'].includes(execution.state)) {
++        const completed = await api.snapshot(projectId, execution.result_archive_id, signal);
++        if (signal.aborted) return;
++        setSnapshot(completed); setJob(execution);
++        if (execution.state !== 'succeeded') throw new Error(execution.result?.message || `Execution ${execution.state}`);
++        setMessage('本次执行已完成'); return;
++      }
++      setJob(execution);
++      await new Promise<void>(resolve => { const finish = () => { signal.removeEventListener('abort', stop); resolve(); }; const timer = setTimeout(finish, 350); const stop = () => { clearTimeout(timer); finish(); }; signal.addEventListener('abort', stop, { once: true }); });
++    }
++  }
++  const runs = archive ? latestRuns(archive, stage) : new Map();
++  const decisions = Object.fromEntries(Object.entries(plan?.decisions || {}).map(([id, value]) => [id, (runs.get(id)?.cache?.decision || value).replaceAll('_', ' ')]));
++  const selectedNode = archive?.graph.nodes.find(node => node.id === selected);
++  const selectedRun = selected ? runs.get(selected) : undefined;
++  const outputs = archive ? (selectedRun?.state === 'succeeded' ? archive.artifacts.filter(item => Object.values(selectedRun.outputs).includes(item.id)) : primaryArtifacts(archive, stage)) : [];
++  return <main className="exec-workspace"><header><div><a href="#/"><ArrowLeft size={14} />返回发现</a><h1>{archive?.metadata.title || '可执行创作档案'}</h1></div><label className="button"><Upload size={14} />导入 .aica / JSON / ZIP<input aria-label="导入可执行档案" type="file" accept=".json,.aica,.zip" disabled={busy || running} onChange={event => { const file = event.target.files?.[0]; event.target.value = ''; if (file) void act(async signal => { const id = await api.upload(file, signal); window.location.hash = `/execute/${id}`; }); }} /></label><button title="刷新档案" aria-label="刷新档案" className="button" disabled={busy || running} onClick={() => setEpoch(value => value + 1)}><RefreshCw size={14} /></button></header>
++    <aside className="exec-projects">{projects.map(project => <a key={project.id} href={`#/execute/${project.id}`} aria-current={projectId === project.id ? 'page' : undefined}>{project.title}</a>)}</aside>
++    <p className="exec-provider" data-provider={imageConfig?.provider || 'unconfigured'}>{imageConfig ? `${imageConfig.provider} · ${imageConfig.model || 'Offline'} · ${imageConfig.timeout_seconds || 10}s` : '尚未配置本次生图 API Key'} <a className="button" href="#/settings">模型与 API 设置</a></p>
++    {error && <p role="alert" className="inline-error">{error}</p>}{message && <p role="status">{message}</p>}
++    {snapshot && <div className="exec-layout"><section className="exec-main">{workflow && <GraphExplorer workflow={workflow} selected={selected} onSelect={setSelected} decisions={decisions} runningId={running ? selected || undefined : undefined} activeWord="" onRemix={() => document.querySelector('.exec-variables')?.scrollIntoView()} />}
++      <div className="exec-stage" role="group" aria-label="产物阶段">{(['draft', 'final'] as const).map(mode => <button className="button" key={mode} aria-pressed={stage === mode} disabled={busy || running} onClick={() => { setStage(mode); setSelected(null); }}>{mode === 'draft' ? 'Stage 1 · Draft' : 'Stage 2 · Final'}</button>)}<label><input aria-label="Original / Fork" type="checkbox" checked={compare} disabled={!comparison} onChange={event => setCompare(event.target.checked)} />Original / Fork</label><button className="button" onClick={() => setSelected(null)}>全部最终产物</button></div>
++      {archive && assets && <><ProvenanceAndLinksBar archive={archive} />{compare && comparison ? <ArchiveDiffViewer originalArchive={comparison.archive} forkedArchive={archive} previewMode={stage} resolveUri={item => assets.resolveUri(item) || comparison.resolveUri(item)} /> : <div className="exec-artifacts">{outputs.filter(item => item.mime_type !== 'application/vnd.aica.preview+json').map(item => <div key={item.id}><ArtifactRenderer artifact={item} archive={archive} previewMode={stage} resolveUri={assets.resolveUri} /><p className="exec-artifact-hash">Artifact {item.id}<br />SHA256 {item.sha256}</p></div>)}{!outputs.length && <p>此修订尚无该阶段产物。</p>}</div>}</>}
++      {selectedNode && <details open className="exec-node-detail"><summary>{selectedNode.label} / {selectedNode.id}</summary><pre>{JSON.stringify({ execution: selectedNode.execution, provenance: selectedNode.provenance, run: selectedRun }, null, 2)}</pre></details>}
++      <details className="exec-history"><summary>所有节点与试错分支</summary>{snapshot.archive.graph.nodes.map(node => <div key={node.id}><strong>{node.label}</strong> · {node.provenance.mode} · {snapshot.archive.graph.branches.find(branch => branch.id === node.branch_id)?.state}<p>{snapshot.archive.graph.branches.find(branch => branch.id === node.branch_id)?.reason}</p><pre>{JSON.stringify(node.provenance.evidence)}</pre></div>)}</details>
++    </section><aside className="exec-variables"><h2>Fork Variables</h2>{variableFields(snapshot.archive).map(({ id, variable, question, modes }) => { const edit = edits[id] || { mode: 'keep' as const, text: variable.type === 'string' ? String(variable.value) : JSON.stringify(variable.value) }; return <fieldset key={id} disabled={busy || running}><legend>{question}</legend><label className="exec-variable-id">{id}</label><div role="group" aria-label={`${id} 修改方式`}>{modes.map(mode => <button className="button" aria-pressed={edit.mode === mode} key={mode} onClick={() => setEdits(values => ({ ...values, [id]: { ...edit, mode, text: mode === 'append' ? variable.type === 'array' ? '[]' : '' : edit.text } }))}>{mode}</button>)}</div><textarea aria-label={`${id} 变量值`} disabled={edit.mode === 'keep'} value={edit.text} onChange={event => setEdits(values => ({ ...values, [id]: { ...edit, text: event.target.value } }))} /></fieldset>; })}
++      <button className="button full" disabled={busy || running || !Object.values(edits).some(value => value.mode !== 'keep')} onClick={() => void act(async signal => { const operations: VariableOperation[] = variableFields(snapshot.archive).map(({ id, variable }) => { const edit = edits[id]; const mode = edit?.mode || 'keep'; return { variable_id: id, mode, ...(mode === 'keep' ? {} : { value: operationValue(variable, mode, edit.text) }) }; }); const result = await api.fork(projectId, snapshot, operations, signal); setOriginal(snapshot); setCompare(false); setEdits({}); setSnapshot(await api.snapshot(projectId, result.archive_id, signal)); setMessage(`Fork 完成：${result.dirty_node_ids.length} 个脏节点`); })}><GitBranch size={14} />创建 Fork</button>
++      <h2>下次执行计划</h2><ul className="exec-plan">{plan?.node_ids.map(id => <li key={id}>{id}<span className={`aica-state state-${plan.decisions?.[id] || 'unknown'}`}>{plan.decisions?.[id]?.replaceAll('_', ' ') || '待检查'}</span></li>)}</ul>{plan?.blockers.map((blocker, index) => <p key={index} className="inline-error">{blocker.node_id}: {blocker.message}</p>)}
++      <label><input type="checkbox" aria-label="允许执行工作流" checked={executeConsent} disabled={busy || running} onChange={event => setExecuteConsent(event.target.checked)} />允许执行工作流</label><label><input type="checkbox" aria-label="记录执行和产物" checked={recordConsent} disabled={busy || running} onChange={event => setRecordConsent(event.target.checked)} />记录执行和产物</label>
++      <button className="button primary full" disabled={busy || running || !plan?.executable || !executeConsent || !recordConsent || Object.values(edits).some(edit => edit.mode !== 'keep')} onClick={() => void act(run)}><Play size={14} />执行 {stage === 'draft' ? 'Draft' : 'Final'}</button>
++      {job && <p data-job-state={job.state} data-job-id={job.id} role="status">{job.state}</p>}{running && <button className="button" onClick={() => void api.cancel(projectId, job!.id).catch(reason => setError(reason.message))}><Square size={14} />取消执行</button>}
++    </aside></div>}
++    <SemanticReview projectId={projectId} archiveId={snapshot?.archive_id} title={snapshot?.archive.metadata.title} />
++  </main>;
++}
+diff --git a/apps/web/src/ImportPage.tsx b/apps/web/src/ImportPage.tsx
+index 029958f..016d969 100644
+--- a/apps/web/src/ImportPage.tsx
++++ b/apps/web/src/ImportPage.tsx
+@@ -4,6 +4,7 @@ import { categories } from './community';
+ import { parseWorkflow } from './workflow';
+ import { newId, type WorkspaceProject } from './workspace';
+ import SemanticImportPanel from './SemanticImportPanel';
++import { ArchiveClient } from '@aica/artifact-renderers';
+ 
+ export default function ImportPage({ author, onImport, onParsed }: { author: string; onImport: (project: WorkspaceProject) => Promise<void>; onParsed: (project: WorkspaceProject) => void }) {
+   const [parsed, setParsed] = useState<ReturnType<typeof parseWorkflow> | null>(null); const [title, setTitle] = useState(''); const [description, setDescription] = useState(''); const [category, setCategory] = useState('图片');
+@@ -16,7 +17,8 @@ export default function ImportPage({ author, onImport, onParsed }: { author: str
+       if (file.size > 16 * 1024 * 1024) throw new Error('档案不能超过 16 MiB。');
+       const text = await file.text(); const document = JSON.parse(text.replace(/^\uFEFF/, ''));
+       if (token !== sequence.current) return;
+-      if (document.aica_version || /\.aica$/i.test(file.name) && document.format !== 'aica-semantic-graph/0.1') { setQueuedFile(file); return; }
++      if (document.aica_version === '0.1') { const id = await new ArchiveClient(globalThis.fetch.bind(globalThis), '/runtime-api').upload(file); window.location.hash = `/execute/${id}`; return; }
++      if (/\.aica$/i.test(file.name) && document.format !== 'aica-semantic-graph/0.1') { setQueuedFile(file); return; }
+       const next = parseWorkflow(text); setParsed(next); setTitle(next.title); setDescription(next.description);
+     } catch (e) { if (token === sequence.current) setError((e as Error).message); } finally { if (token === sequence.current) setBusy(false); }
+   }
+diff --git a/apps/web/src/ModulePreviewDock.tsx b/apps/web/src/ModulePreviewDock.tsx
+index 83b114e..7566ffd 100644
+--- a/apps/web/src/ModulePreviewDock.tsx
++++ b/apps/web/src/ModulePreviewDock.tsx
+@@ -8,18 +8,30 @@ import ProjectArtwork from './ProjectArtwork';
+ 
+ function Artifact({ artifact }: { artifact: { uri: string; mime: string } }) {
+   const [failed, setFailed] = useState(false);
+-  if (failed || !safeMedia(artifact.uri, artifact.mime)) return <div className="media-unavailable">产物暂不可访问，请检查地址或访问权限。</div>;
++  if (failed || !safeMedia(artifact.uri, artifact.mime)) return <div className="media-unavailable">产物暂不可访问。</div>;
+   return artifact.mime.startsWith('video/') ? <video src={artifact.uri} controls preload="metadata" onError={() => setFailed(true)} /> : <img src={artifact.uri} alt="模块生成产物" onError={() => setFailed(true)} />;
+ }
++
+ export default function ModulePreviewDock({ project, selected, preview, running, gateway, onGenerate, onCancel }: { project: WorkspaceProject; selected?: WorkflowModule; preview?: ModulePreview; running: boolean; gateway: boolean; onGenerate: (stage: 'draft' | 'final') => void; onCancel: () => void }) {
+-  const [view, setView] = useState('remix'); const [large, setLarge] = useState(false); const dialog = useRef<HTMLDialogElement>(null);
++  const [view, setView] = useState('remix'), [large, setLarge] = useState(false);
++  const dialog = useRef<HTMLDialogElement>(null);
+   useEffect(() => { if (large) dialog.current?.showModal(); }, [large]);
+   const canConfirm = preview?.stage === 'draft' && preview.nodeId === selected?.id;
+-  const originalArtifact = project.workflow.modules.flatMap(n => n.artifacts).filter(a => /^(image|video)\//.test(a.mime) && safeMedia(a.uri, a.mime)).at(-1);
++  const originalArtifact = project.workflow.modules.flatMap(node => node.artifacts).filter(item => /^(image|video)\//.test(item.mime) && safeMedia(item.uri, item.mime)).at(-1);
+   const baseline = project.remix?.baseValues ?? project.values;
+   const artworkProject = { ...project, values: baseline };
+   const original = () => originalArtifact ? <Artifact key={originalArtifact.uri} artifact={originalArtifact} /> : <figure><ProjectArtwork project={artworkProject} values={baseline} /><figcaption>示意封面 · 非真实产物</figcaption></figure>;
+-  const result = () => preview ? preview.artifact ? <Artifact key={preview.artifact.uri} artifact={preview.artifact} /> : <figure className="simulated-art"><ProjectArtwork project={artworkProject} values={{ ...project.values, detail: preview.prompt }} /><span>LOCAL SIMULATION</span><figcaption>仅交互示意，未按提示词调用模型</figcaption></figure> : <div className="module-preview-empty"><ImagePlus size={30} /><strong>下一种可能，留在这里。</strong><p>展开模块，编辑提示词<br />再生成一份预览。</p><span>结果展示区域</span></div>;
++  const result = () => preview?.artifact ? <Artifact key={preview.artifact.uri} artifact={preview.artifact} /> : <div className="module-preview-empty"><ImagePlus size={30} /><strong>等待生成产物</strong></div>;
+   const media = () => view === 'original' ? original() : view === 'compare' ? <div className="module-preview-compare"><div>{original()}<span>原始产物／封面</span></div><div>{result()}<span>修改结果</span></div></div> : result();
+-  return <aside className="module-preview-dock" aria-label="修改结果预览"><header><div><span className="kicker">YOUR NEXT VERSION</span><h2>结果预览<span>{running ? '生成中' : preview ? preview.stage.toUpperCase() : '等待生成'}</span></h2></div><button className="icon-button" aria-label="放大预览" disabled={!preview && view !== 'original'} onClick={() => setLarge(true)}><Expand size={16} /></button></header><SegmentedControl label="预览展示方式" value={view} onChange={setView} options={[{ id: 'remix', label: '修改结果' }, { id: 'original', label: '原始作品' }, { id: 'compare', label: '并排对比' }]} /><div className="module-preview-media">{media()}{running && <div className="module-preview-loading"><LoaderCircle className="spin" size={24} /><span>正在生成模块预览…</span></div>}</div>{preview && <div className="module-preview-details"><span className={`result-badge ${preview.stage}`}>{preview.stage === 'final' ? 'FINAL CONFIRMED' : 'DRAFT'} · {preview.simulated ? '模拟' : '网关产物'}</span><strong>{project.workflow.modules.find(n => n.id === preview.nodeId)?.title}</strong><p>{preview.prompt}</p><small>{preview.model || '未提供模型'}</small></div>}<div className="module-preview-actions">{running ? <button className="button full" onClick={onCancel}>取消本次生成</button> : <button className="button primary full" disabled={!project.owned || !selected || selected.dead || !selected.prompt.trim()} onClick={() => onGenerate(canConfirm ? 'final' : 'draft')}>{canConfirm ? <Check size={15} /> : <Play size={15} />}{canConfirm ? '确认最终版本' : gateway ? '生成模块预览' : '生成预览（模拟）'}<ArrowRight size={14} /></button>}<p>{!project.owned ? '先 Fork，再编辑和生成自己的版本。' : !selected ? '先点击一个模块，选择需要生成的步骤。' : gateway ? '通过设置中的团队网关调用模型。' : '未配置预览网关 · 不会调用真实模型'}</p><a href="#/settings">模型与 API 设置<ArrowRight size={12} /></a></div><dialog ref={dialog} className="preview-dialog" aria-label="作品预览" onCancel={e => { e.preventDefault(); setLarge(false); }} onClick={e => { if (e.target === dialog.current) setLarge(false); }}><div className="preview-dialog-title"><strong>作品预览</strong><button className="icon-button" aria-label="关闭放大预览" onClick={() => { dialog.current?.close(); setLarge(false); }}><X size={20} /></button></div><div className="preview-dialog-media">{large && media()}</div></dialog></aside>;
++  const source = preview?.source === 'live_api' ? 'Live API' : preview?.source === 'local_fallback' ? 'Local Fallback' : preview?.source === 'prewarmed_cache' ? 'Prewarmed Cache' : preview?.simulated ? '历史模拟记录' : '外部网关产物';
++  return <aside className="module-preview-dock" aria-label="修改结果预览">
++    <header><div><span className="kicker">YOUR NEXT VERSION</span><h2>结果预览<span>{running ? '生成中' : preview ? preview.stage.toUpperCase() : '等待生成'}</span></h2></div><button className="icon-button" aria-label="放大预览" disabled={!preview && view !== 'original'} onClick={() => setLarge(true)}><Expand size={16} /></button></header>
++    <SegmentedControl label="预览展示方式" value={view} onChange={setView} options={[{ id: 'remix', label: '修改结果' }, { id: 'original', label: '原始作品' }, { id: 'compare', label: '并排对比' }]} />
++    <div className="module-preview-media">{media()}{running && <div className="module-preview-loading"><LoaderCircle className="spin" size={24} /><span>正在生成模块预览…</span></div>}</div>
++    {preview && <div className="module-preview-details"><span className={`result-badge ${preview.stage}`}>{preview.stage.toUpperCase()} · {source}</span><strong>{project.workflow.modules.find(node => node.id === preview.nodeId)?.title}</strong><p>{preview.prompt}</p><small>{preview.model || '未提供模型'}</small></div>}
++    <div className="module-preview-actions">{running ? <button className="button full" onClick={onCancel}>取消本次生成</button> : <button className="button primary full" disabled={!project.owned || !selected || selected.dead || !selected.prompt.trim() || !!project.workflow.semanticGraph} onClick={() => onGenerate(canConfirm ? 'final' : 'draft')}>{canConfirm ? <Check size={15} /> : <Play size={15} />}{canConfirm ? '确认最终版本' : '生成模块预览'}<ArrowRight size={14} /></button>}
++      <p>{project.workflow.semanticGraph ? '语义图尚未绑定执行协议。' : !project.owned ? '先 Fork，再编辑和生成自己的版本。' : !selected ? '请先选择模块。' : gateway ? '通过所选外部网关生成单节点预览。' : '使用模型设置中的 API 生成单节点预览。'}</p><a href="#/settings">模型与 API 设置<ArrowRight size={12} /></a><a href="#/execute">全流程 Fork / Plan / Replay<ArrowRight size={12} /></a>
++    </div>
++    <dialog ref={dialog} className="preview-dialog" aria-label="作品预览" onCancel={event => { event.preventDefault(); setLarge(false); }} onClick={event => { if (event.target === dialog.current) setLarge(false); }}><div className="preview-dialog-title"><strong>作品预览</strong><button className="icon-button" aria-label="关闭放大预览" onClick={() => { dialog.current?.close(); setLarge(false); }}><X size={20} /></button></div><div className="preview-dialog-media">{large && media()}</div></dialog>
++  </aside>;
+ }
+diff --git a/apps/web/src/SemanticReview.tsx b/apps/web/src/SemanticReview.tsx
+new file mode 100644
+index 0000000..8ad4408
+--- /dev/null
++++ b/apps/web/src/SemanticReview.tsx
+@@ -0,0 +1,120 @@
++import { useEffect, useMemo, useRef, useState } from 'react';
++import { Background, Controls, ReactFlow, type Edge, type Node } from '@xyflow/react';
++import { Check, FileSearch, Upload, Play, Download } from 'lucide-react';
++import type { GraphDocument } from '../../../packages/runtime/design/graph-v0.1/graph.generated';
++import { importParserBundle, parserJson, parserRequest, readSemanticGraph, type ParseJob, type ParserSelection, type PreparedInput } from './parserClient';
++import '@xyflow/react/dist/style.css';
++import './semantic.css';
++
++export default function SemanticReview({ projectId = '', archiveId = '', title = '' }: { projectId?: string; archiveId?: string; title?: string }) {
++  const [selection, setSelection] = useState<ParserSelection>();
++  const [input, setInput] = useState<PreparedInput>();
++  const [sourceNodes, setSourceNodes] = useState<{ id: string; label: string }[]>([]);
++  const [scope, setScope] = useState<string[] | null>(null);
++  const pending = useRef<{ key: string; requestId: string } | undefined>(undefined);
++  const [provider, setProvider] = useState<{ configured: boolean; model: string; parser_version: string }>();
++  const [jobs, setJobs] = useState<ParseJob[]>([]);
++  const [job, setJob] = useState<ParseJob>();
++  const [graph, setGraph] = useState<GraphDocument>();
++  const [selected, setSelected] = useState<string>();
++  const [evidence, setEvidence] = useState<unknown>();
++  const [consent, setConsent] = useState(false);
++  const [busy, setBusy] = useState(false);
++  const [error, setError] = useState('');
++  const request = useRef<AbortController | undefined>(undefined);
++  const prefix = selection ? `/projects/${selection.projectId}` : '';
++  const running = !!job && ['queued', 'running'].includes(job.state);
++  useEffect(() => {
++    const abort = new AbortController();
++    parserRequest<{ configured: boolean; model: string; parser_version: string }>('/graph-parser', { signal: abort.signal }).then(setProvider).catch(reason => { if (!abort.signal.aborted) setError(reason.message); });
++    return () => { abort.abort(); request.current?.abort(); };
++  }, []);
++  useEffect(() => {
++    request.current?.abort(); setSelection(undefined); setInput(undefined); setGraph(undefined); setJob(undefined); setJobs([]); setEvidence(undefined); setConsent(false); setBusy(false); setError(''); setSourceNodes([]); setScope(null); pending.current = undefined;
++    try { const saved = localStorage.getItem(`aica.parser:${projectId}:${archiveId}`); if (saved) setSelection(JSON.parse(saved)); } catch { /* A fresh import remains available. */ }
++  }, [projectId, archiveId]);
++  useEffect(() => {
++    if (!selection) return;
++    const abort = new AbortController();
++    setSourceNodes([]); setScope(null); setInput(undefined); setConsent(false);
++    parserRequest<{ archive: { graph: { nodes: { id: string; label: string }[] } } }>(`${prefix}/archive?import_id=${selection.importId}`, { signal: abort.signal }).then(value => { if (!abort.signal.aborted) setSourceNodes(value.archive.graph.nodes); }).catch(reason => { if (!abort.signal.aborted) setError(reason.message); });
++    parserRequest<{ parses: ParseJob[] }>(`${prefix}/semantic-parses`, { signal: abort.signal }).then(value => { if (!abort.signal.aborted) setJobs(value.parses.filter(item => (item as ParseJob & { import_id: string }).import_id === selection.importId)); }).catch(reason => { if (!abort.signal.aborted) setError(reason.message); });
++    return () => abort.abort();
++  }, [selection, prefix]);
++  async function act(action: (signal: AbortSignal) => Promise<void>) {
++    if (busy || running) return;
++    const abort = new AbortController(); request.current = abort; setBusy(true); setError(''); setEvidence(undefined);
++    try { await action(abort.signal); } catch (reason) { if (!abort.signal.aborted) setError(reason instanceof Error ? reason.message : String(reason)); }
++    finally { if (request.current === abort && !abort.signal.aborted) setBusy(false); }
++  }
++  async function attach(bytes: ArrayBuffer, signal: AbortSignal) {
++    const value = await importParserBundle(bytes, title || 'Imported transfer archive', signal);
++    if (signal.aborted) return;
++    setSelection(value); setInput(undefined); setGraph(undefined); setJob(undefined); setJobs([]); setConsent(false);
++    try { localStorage.setItem(`aica.parser:${projectId}:${archiveId}`, JSON.stringify(value)); } catch { /* The server retains the import even without browser storage. */ }
++  }
++  async function exportSnapshot(signal: AbortSignal) {
++    const response = await fetch(`/runtime-api/projects/${projectId}/transfer?archive_id=${encodeURIComponent(archiveId)}`, { signal });
++    if (!response.ok) throw new Error(`Archive export failed: ${response.status}`);
++    return response;
++  }
++  async function showGraph(value: ParseJob, signal: AbortSignal) {
++    if (!selection) return;
++    const document = await readSemanticGraph(selection, value, signal);
++    if (!signal.aborted) { setGraph(document); setSelected(undefined); setEvidence(undefined); }
++  }
++  const flow = useMemo(() => {
++    if (!graph) return { nodes: [], edges: [] };
++    const levels = new Map(graph.nodes.map(node => [node.id, 0]));
++    for (let round = 0; round < graph.nodes.length; round++) {
++      let changed = false;
++      for (const edge of graph.edges.filter(edge => edge.kind !== 'semantic' && edge.state === 'verified')) {
++        const level = Math.min(graph.nodes.length, (levels.get(edge.source) || 0) + 1);
++        if (level > (levels.get(edge.target) || 0)) { levels.set(edge.target, level); changed = true; }
++      }
++      if (!changed) break;
++    }
++    const rows = new Map<number, number>();
++    const nodes: Node[] = graph.nodes.map(node => {
++      const level = levels.get(node.id) || 0, row = rows.get(level) || 0; rows.set(level, row + 1);
++      return { id: node.id, position: { x: level * 260, y: row * 145 }, data: { label: <><strong>{node.label}</strong><small>{node.kind} · {node.purpose.review}</small></> }, selected: selected === node.id, style: { width: 210, background: '#19262b', color: '#edf2ed', border: '1px solid #779b9b', borderRadius: 4, padding: 14 } };
++    });
++    const edges: Edge[] = graph.edges.map(edge => {
++      const verified = edge.kind !== 'semantic' && edge.state === 'verified';
++      return { id: edge.id, source: edge.source, target: edge.target, label: edge.kind === 'semantic' ? `semantic · ${edge.relation}` : `${edge.kind} · ${edge.state}`, style: { stroke: verified ? '#7fca9b' : '#d9b15a', strokeDasharray: verified ? undefined : '5 5' }, labelStyle: { fill: '#142126', fontSize: 11 }, labelBgStyle: { fill: '#e6ece7' } };
++    });
++    return { nodes, edges };
++  }, [graph, selected]);
++  const step = graph?.nodes.find(node => node.id === selected);
++  return <section className="semantic-review" aria-label="语义图解析与证据"><header><div><h2><FileSearch size={18} />语义图与来源证据</h2><p>待审核派生视图 · 不可执行</p></div><span>{provider?.configured ? `${provider.model} · ${provider.parser_version}` : '解析模型未配置'}</span></header>
++    <div className="semantic-toolbar">{projectId && archiveId && <><button className="button" disabled={busy || running} onClick={() => void act(async signal => { const response = await exportSnapshot(signal); await attach(await response.arrayBuffer(), signal); })}><Check size={14} />载入当前档案快照</button><button className="button" disabled={busy || running} onClick={() => void act(async signal => { const response = await exportSnapshot(signal); const url = URL.createObjectURL(await response.blob()); const link = document.createElement('a'); link.href = url; link.download = 'archive.aica.zip'; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); })}><Download size={14} />导出完整档案</button></>}
++      <label className="button"><Upload size={14} />导入 A 传输 ZIP<input type="file" aria-label="导入语义分析传输包" accept=".zip" disabled={busy || running} onChange={event => { const file = event.target.files?.[0]; event.target.value = ''; if (file) void act(async signal => { if (file.size > 512 * 1024 * 1024) throw new Error('Transfer exceeds 512 MiB'); await attach(await file.arrayBuffer(), signal); }); }} /></label>
++      {selection && <button className="button" disabled={busy || running || (sourceNodes.length > 0 && scope?.length === 0)} onClick={() => void act(async signal => { const result = await parserRequest<{ input: PreparedInput }>(`${prefix}/semantic-parse-input`, parserJson({ import_id: selection.importId, node_ids: scope }, signal)); if (!signal.aborted) { setInput(result.input); setConsent(false); } })}><FileSearch size={14} />准备解析输入</button>}</div>
++    {selection && <p className="semantic-identity">Source import: {selection.importId}</p>}
++    {selection && sourceNodes.length > 0 && <fieldset className="semantic-scope" disabled={busy || running}><legend>解析范围</legend><label><input type="checkbox" aria-label="全部原始节点" checked={scope === null} onChange={event => { setScope(event.target.checked ? null : []); setInput(undefined); setConsent(false); setError(''); }} />全部原始节点（{sourceNodes.length}）</label>{scope !== null && <div>{sourceNodes.map(node => <label key={node.id}><input type="checkbox" aria-label={`解析节点 ${node.id}`} checked={scope.includes(node.id)} onChange={event => { setScope(current => event.target.checked ? [...(current || []), node.id] : (current || []).filter(id => id !== node.id)); setInput(undefined); setConsent(false); setError(''); }} />{node.label} · {node.id}</label>)}</div>}</fieldset>}
++    {error && <p role="alert" className="inline-error">{error}</p>}
++    {input && <><details open><summary>待发送输入：{input.facts.length} 项事实 / {input.source_node_ids.length} 个原始节点</summary><pre>{JSON.stringify(input, null, 2)}</pre></details><label className="semantic-consent"><input type="checkbox" checked={consent} aria-label="允许发送已审核事实到解析模型" disabled={busy || running} onChange={event => setConsent(event.target.checked)} />允许发送以上已审核事实到解析模型（可能产生 API 费用）</label><button className="button" disabled={!consent || !provider?.configured || busy || running} onClick={() => void act(async signal => {
++      const key = `aica.parse-request:${selection!.importId}:${input.input_sha256}`;
++      if (pending.current?.key !== key) {
++        let saved: string | null = null; try { saved = localStorage.getItem(key); } catch { /* The in-memory request still preserves retry identity. */ }
++        pending.current = { key, requestId: saved || crypto.randomUUID() };
++        try { localStorage.setItem(key, pending.current.requestId); } catch { /* Browser storage is optional. */ }
++      }
++      const result = await parserRequest<{ parse: ParseJob }>(`${prefix}/semantic-parses`, parserJson({ request_id: pending.current.requestId, import_id: selection!.importId, input_sha256: input.input_sha256, node_ids: scope, allow_external_processing: true }, signal));
++      let value = result.parse;
++      while (!signal.aborted) {
++        setJob(value);
++        if (!['queued', 'running'].includes(value.state)) { setJobs(current => [value, ...current.filter(item => item.id !== value.id)]); if (value.state !== 'unknown') { pending.current = undefined; try { localStorage.removeItem(key); } catch { /* Browser storage is optional. */ } } if (value.state === 'succeeded') await showGraph(value, signal); else throw new Error(`${value.state}: ${value.error_code || 'Parse did not complete'}`); break; }
++        await new Promise<void>(resolve => { const timer = setTimeout(stop, 700); function stop() { clearTimeout(timer); signal.removeEventListener('abort', stop); resolve(); } signal.addEventListener('abort', stop, { once: true }); });
++        if (signal.aborted) return;
++        value = (await parserRequest<{ parse: ParseJob }>(`${prefix}/semantic-parses/${value.id}`, { signal })).parse;
++      }
++    })}><Play size={14} />提交语义解析</button></>}
++    {job && <p role="status">Parse: {job.state} {job.error_code || ''}</p>}
++    {jobs.length > 0 && <div className="semantic-history">{jobs.map(item => <button className="button" key={item.id} disabled={busy || running || item.state !== 'succeeded'} onClick={() => void act(signal => showGraph(item, signal))}>{item.state} · {item.id.slice(0, 8)}</button>)}</div>}
++    {graph && <><p className="semantic-identity">{graph.state} · executable=false · {graph.graph_id} / {graph.revision_id}</p><div className="semantic-canvas"><ReactFlow key={graph.revision_id} nodes={flow.nodes} edges={flow.edges} fitView nodesDraggable={false} nodesConnectable={false} onNodeClick={(_, node) => { setSelected(node.id); setEvidence(undefined); }}><Background /><Controls showInteractive={false} /></ReactFlow></div><details open><summary>范围与缺项</summary><pre>{JSON.stringify(graph.coverage, null, 2)}</pre></details>
++      {step && <div className="semantic-step"><h3>{step.label}</h3><p>{step.purpose.text}</p><pre>{JSON.stringify({ kind: step.kind, purpose: step.purpose, source_node_ids: step.source_node_ids, run_ids: step.run_ids, artifact_ids: step.artifact_ids, requirements: step.requirements }, null, 2)}</pre><div className="semantic-toolbar">{step.evidence_ids.map(id => <button className="button" key={id} disabled={busy} onClick={() => void act(async signal => { const result = await parserRequest(`${prefix}/semantic-graphs/${graph.graph_id}/evidence/${encodeURIComponent(id)}?revision_id=${encodeURIComponent(graph.revision_id)}`, { signal }); if (!signal.aborted) setEvidence(result); })}>Evidence {id}</button>)}</div></div>}
++      {evidence !== undefined && <pre aria-label="来源证据">{JSON.stringify(evidence, null, 2)}</pre>}
++      <details><summary>变量建议（待审核）· {graph.variables.length}</summary><pre>{JSON.stringify(graph.variables, null, 2)}</pre></details></>}
++  </section>;
++}
+diff --git a/apps/web/src/SettingsPage.tsx b/apps/web/src/SettingsPage.tsx
+index e3a6237..18ea147 100644
+--- a/apps/web/src/SettingsPage.tsx
++++ b/apps/web/src/SettingsPage.tsx
+@@ -1,19 +1,24 @@
+ import { useState } from 'react';
+-import { ArrowLeft, Check, Eye, EyeOff, KeyRound, Save, Settings2 } from 'lucide-react';
+-import { defaultSettings, validEndpoint, type AppSettings, type ModelCredentials } from './settings';
++import { ArrowLeft, Check, Eye, EyeOff, Save, Settings2 } from 'lucide-react';
++import { defaultSettings, validEndpoint, type AppSettings, type ModelConfig, type ModelCredentials } from './settings';
+ 
+ export default function SettingsPage({ settings, credentials, onSave }: { settings: AppSettings; credentials: ModelCredentials; onSave: (settings: AppSettings, credentials: ModelCredentials) => void }) {
+   const [draft, setDraft] = useState(() => structuredClone(settings));
+-  const [keys, setKeys] = useState(credentials); const [show, setShow] = useState(false); const [notice, setNotice] = useState(''); const [error, setError] = useState('');
++  const [keys, setKeys] = useState(credentials), [show, setShow] = useState(false), [notice, setNotice] = useState(''), [error, setError] = useState('');
++  function update(kind: 'image' | 'video', patch: Partial<ModelConfig>) { setDraft(value => ({ ...value, [kind]: { ...value[kind], ...patch } })); setNotice(''); }
+   function save() {
+     if (!draft.displayName.trim()) { setError('请填写显示名称。'); return; }
+-    if (![draft.image.apiBase, draft.video.apiBase, draft.previewEndpoint].every(validEndpoint)) { setError('API 地址需为 HTTP(S) 地址，请勿在地址中填写账号、密钥、查询参数或片段。'); return; }
+-    if (!draft.image.model.trim()) { setError('请填写默认生图模型。'); return; }
+-    try { onSave({ ...draft, displayName: draft.displayName.trim() }, keys); setNotice('设置已保存，API Key 仅在本次页面会话中使用。'); setError(''); } catch { setError('本机存储空间不足，设置未保存。'); }
++    if (![draft.image.apiBase, draft.video.apiBase, draft.previewEndpoint].every(validEndpoint)) { setError('API 地址需为 HTTP(S)，不含账号、密钥或查询参数。'); return; }
++    if (draft.image.provider !== 'local_fallback' && !draft.image.model.trim()) { setError('请填写默认生图模型。'); return; }
++    if (!Number.isFinite(draft.image.timeoutSeconds ?? 10) || (draft.image.timeoutSeconds ?? 10) <= 0 || (draft.image.timeoutSeconds ?? 10) > 300) { setError('等待时限需为 1 至 300 秒。'); return; }
++    try { onSave({ ...draft, displayName: draft.displayName.trim() }, keys); setNotice('设置已保存，API Key 仅在本次页面会话中使用。'); setError(''); } catch { setError('设置未保存，请检查浏览器存储。'); }
+   }
+-  return <main className="settings-page content-page"><a className="back-link" href="#/creations"><ArrowLeft size={15} />返回我的创造</a><div className="content-page-heading"><span className="kicker">YOUR SPACE, YOUR TOOLS</span><h1>我的设置</h1><p>让创作环境，适合你的节奏。</p></div><div className="settings-layout"><aside className="settings-index"><Settings2 size={22} /><strong>创作偏好</strong><a href="#settings-general" onClick={e => { e.preventDefault(); document.getElementById('settings-general')?.scrollIntoView(); }}>基础设置</a><a href="#settings-models" onClick={e => { e.preventDefault(); document.getElementById('settings-models')?.scrollIntoView(); }}>模型与 API</a><span>当前浏览器保存<br />密钥不写入本地存储</span></aside><div className="settings-sections">
+-    <section className="surface-section" id="settings-general"><h2>基础设置</h2><p>用于本机作品署名和工作台交互。</p><label className="form-field">显示名称<input value={draft.displayName} maxLength={40} onChange={e => { setDraft({ ...draft, displayName: e.target.value }); setNotice(''); }} /></label><label className="setting-toggle"><span><strong>自动保存创作草稿</strong><small>修改模块后自动保存到本机；关闭后使用工作台的保存按钮。</small></span><input type="checkbox" role="switch" checked={draft.autoSave} onChange={e => { setDraft({ ...draft, autoSave: e.target.checked }); setNotice(''); }} /></label><label className="setting-toggle"><span><strong>提示词跟随高亮</strong><small>鼠标经过或键盘聚焦词语时，高亮同词及模块中的对应内容。</small></span><input type="checkbox" role="switch" checked={draft.highlightWords} onChange={e => { setDraft({ ...draft, highlightWords: e.target.checked }); setNotice(''); }} /></label></section>
+-    <section className="surface-section" id="settings-models"><h2>模型与 API</h2><p>默认使用千问生图。配置项将供生成服务适配器使用。</p>{(['image', 'video'] as const).map(kind => <fieldset className="model-settings" key={kind}><legend>{kind === 'image' ? '生图模型' : '生视频模型'}</legend><div className="two-fields"><label className="form-field">服务商<select value={draft[kind].provider} onChange={e => { setDraft({ ...draft, [kind]: { ...draft[kind], provider: e.target.value } }); setNotice(''); }}><option value="qwen">千问 / 阿里云百炼</option><option value="custom">自定义服务商</option></select></label><label className="form-field">模型 ID<input value={draft[kind].model} placeholder={kind === 'image' ? 'qwen-image' : '填写你的生视频模型 ID'} onChange={e => { setDraft({ ...draft, [kind]: { ...draft[kind], model: e.target.value } }); setNotice(''); }} /></label></div><label className="form-field">服务商 API Base URL<input type="url" value={draft[kind].apiBase} placeholder="https://…" onChange={e => { setDraft({ ...draft, [kind]: { ...draft[kind], apiBase: e.target.value } }); setNotice(''); }} /></label><label className="form-field">API Key<span className="secret-input"><KeyRound size={16} /><input type={show ? 'text' : 'password'} autoComplete="off" value={keys[kind]} placeholder="仅本次会话使用，刷新后清除" onChange={e => { setKeys({ ...keys, [kind]: e.target.value }); setNotice(''); }} /><button type="button" className="icon-button" aria-label={show ? '隐藏 API Key' : '显示 API Key'} onClick={() => setShow(!show)}>{show ? <EyeOff size={16} /> : <Eye size={16} />}</button></span></label></fieldset>)}<label className="form-field">团队预览网关 URL（可选）<input aria-label="团队预览网关 URL（可选）" type="url" value={draft.previewEndpoint} placeholder="http://127.0.0.1:8000/api/previews" onChange={e => { setDraft({ ...draft, previewEndpoint: e.target.value }); setNotice(''); }} /><small>留空时使用明确标记的本地模拟。填写后，点击生成会向此地址提交提示词与选用的 API Key；需由团队网关适配供应商协议。</small></label><div className="inline-note">仅填写模型 API 地址不代表已连接服务。真实模型调用由预览网关处理，页面不会直接调用供应商接口。</div></section>
+-    <div className="settings-save"><button className="button" onClick={() => { setDraft(structuredClone(defaultSettings)); setKeys({ image: '', video: '' }); setNotice('已恢复默认表单，请保存以应用。'); }}>恢复默认</button><button className="button primary" onClick={save}><Save size={15} />保存设置</button></div>{error && <p className="inline-error" role="alert">{error}</p>}{notice && <p className="inline-success" role="status"><Check size={15} />{notice}</p>}
++  return <main className="settings-page content-page"><a className="back-link" href="#/execute"><ArrowLeft size={15} />返回可执行档案</a><div className="content-page-heading"><h1>我的设置</h1></div><div className="settings-layout"><aside className="settings-index"><Settings2 size={22} /><strong>创作偏好</strong><span>配置保存在当前浏览器<br />密钥仅在页面会话中保留</span></aside><div className="settings-sections">
++    <section className="surface-section"><h2>基础设置</h2><label className="form-field">显示名称<input value={draft.displayName} maxLength={40} onChange={event => setDraft({ ...draft, displayName: event.target.value })} /></label><label className="setting-toggle"><span>自动保存草稿</span><input type="checkbox" role="switch" checked={draft.autoSave} onChange={event => setDraft({ ...draft, autoSave: event.target.checked })} /></label><label className="setting-toggle"><span>提示词同词高亮</span><input type="checkbox" role="switch" checked={draft.highlightWords} onChange={event => setDraft({ ...draft, highlightWords: event.target.checked })} /></label></section>
++    <section className="surface-section" id="settings-models"><h2>模型与 API</h2>{(['image', 'video'] as const).map(kind => <fieldset className="model-settings" key={kind}><legend>{kind === 'image' ? '生图模型' : '生视频模型（生成适配器尚未接入）'}</legend><div className="two-fields"><label className="form-field">服务商<select aria-label={`${kind} 服务商`} value={draft[kind].provider} onChange={event => update(kind, { provider: event.target.value })}><option value="qwen">千问 / 阿里云百炼</option><option value="custom">自定义 OpenAI 兼容接口</option><option value="openai">OpenAI 兼容接口</option><option value="siliconflow">SiliconFlow</option><option value="fal">Fal.ai</option><option value="sdcpp">本地 FLUX / stable-diffusion.cpp</option>{kind === 'image' && <option value="local_fallback">离线示意预览 / Local Fallback</option>}</select></label><label className="form-field">模型 ID<input aria-label={`${kind} 模型 ID`} value={draft[kind].model} onChange={event => update(kind, { model: event.target.value })} /></label></div><label className="form-field">服务商 API URL<input aria-label={`${kind} API URL`} type="url" value={draft[kind].apiBase} placeholder="https://…/v1/images/generations" onChange={event => update(kind, { apiBase: event.target.value })} /></label>
++      <label className="form-field">API Key<span className="secret-input"><input aria-label={`${kind} API Key`} type={show ? 'text' : 'password'} autoComplete="off" value={keys[kind]} onChange={event => setKeys({ ...keys, [kind]: event.target.value })} /><button type="button" className="icon-button" aria-label={show ? '隐藏 API Key' : '显示 API Key'} onClick={() => setShow(!show)}>{show ? <EyeOff size={16} /> : <Eye size={16} />}</button></span></label>
++      {kind === 'image' && <><div className="two-fields"><label className="form-field">Draft 模型（可选）<input aria-label="Draft 模型" value={draft.image.draftModel || ''} onChange={event => update('image', { draftModel: event.target.value })} /></label><label className="form-field">Final 模型（可选）<input aria-label="Final 模型" value={draft.image.hqModel || ''} onChange={event => update('image', { hqModel: event.target.value })} /></label></div><label className="form-field">API 等待时限（秒）<input aria-label="API 等待时限" type="number" min={1} max={300} value={draft.image.timeoutSeconds ?? 10} onChange={event => update('image', { timeoutSeconds: Number(event.target.value) })} /></label><label className="setting-toggle"><span>API 失败时允许 Local Fallback 示意预览</span><input aria-label="允许 Local Fallback" type="checkbox" checked={draft.image.allowFallback ?? true} onChange={event => update('image', { allowFallback: event.target.checked })} /></label></>}
++    </fieldset>)}<details><summary>外部单节点预览网关（可选）</summary><label className="form-field">网关 URL<input aria-label="团队预览网关 URL（可选）" type="url" value={draft.previewEndpoint} onChange={event => setDraft({ ...draft, previewEndpoint: event.target.value })} /></label></details></section>
++    <div className="settings-save"><button className="button" onClick={() => { setDraft(structuredClone(defaultSettings)); setKeys({ image: '', video: '' }); }}>恢复默认</button><button className="button primary" onClick={save}><Save size={15} />保存设置</button></div>{error && <p className="inline-error" role="alert">{error}</p>}{notice && <p className="inline-success" role="status"><Check size={15} />{notice}</p>}
+   </div></div></main>;
+ }
+diff --git a/apps/web/src/executable.css b/apps/web/src/executable.css
+new file mode 100644
+index 0000000..5a259a3
+--- /dev/null
++++ b/apps/web/src/executable.css
+@@ -0,0 +1,35 @@
++.exec-workspace { max-width: 1600px; margin: auto; padding: 24px; color: #cddde3; }
++.exec-workspace>header { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-bottom: 22px; }
++.exec-workspace>header>div { flex: 1; min-width: 200px; }
++.exec-workspace h1 { font-size: 25px; line-height: 1.4; margin-top: 16px; overflow-wrap: anywhere; }
++.exec-workspace h2 { font-size: 17px; margin: 18px 0; }
++.exec-workspace input[type=file] { width: 1px; position: absolute; opacity: 0; }
++.exec-projects { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 24px; }
++.exec-projects a { padding: 8px 12px; border-bottom: 2px solid #3d5c68; max-width: 100%; overflow-wrap: anywhere; font-size: 12px; }
++.exec-projects a[aria-current=page] { border-color: #a2d5a4; }
++.exec-layout { display: grid; grid-template-columns: minmax(0,1fr) 320px; gap: 24px; }
++.exec-main { min-width: 0; }
++.exec-main .graph-explorer { min-height: 440px; }
++.exec-variables { border-left: 1px solid #38505b; padding-left: 20px; min-width: 0; }
++.exec-variables fieldset { border: 0; margin: 22px 0; padding: 0; min-width: 0; }
++.exec-variables legend { font-size: 13px; margin-bottom: 10px; }
++.exec-variables fieldset>div { display: flex; gap: 6px; margin: 8px 0; flex-wrap: wrap; }
++.exec-variables .button { padding: 7px 10px; font-size: 12px; }
++.exec-variables [aria-pressed=true], .exec-stage [aria-pressed=true] { border-color: #a6cfa8; color: #a6cfa8; }
++.exec-variables textarea { width: 100%; min-height: 80px; resize: vertical; background: #101e27; color: #d8e2e6; border: 1px solid #405763; padding: 10px; }
++.exec-variables>label { display: flex; gap: 8px; padding: 10px 0; font-size: 12px; }
++.exec-variable-id { color: #8eabb6; font: 11px monospace; }
++.exec-stage { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 20px 0; }
++.exec-stage label { font-size: 12px; }
++.exec-artifacts { display: grid; gap: 20px; }
++.exec-provider { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; font-size: 12px; margin: 16px 0; }
++.exec-main>.aica-artifacts, .exec-artifacts .aica-artifacts { padding: 16px; background: #f5f7f7; border-radius: 4px; }
++.exec-artifact-hash { overflow-wrap: anywhere; font: 11px/1.6 monospace; color: #a8bec8; margin: 12px 0; }
++.exec-plan { padding: 0; list-style: none; }
++.exec-plan li { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; font: 12px monospace; padding: 8px 0; overflow-wrap: anywhere; }
++.exec-plan .aica-state { font-size: 10px; padding: 4px; }
++.state-CACHE_HIT { color: #154e2e; background: #b8e4c9; }.state-RECOMPUTE { color: #634600; background: #f5d674; }.state-REBUILD { color: #174675; background: #bed8f3; }
++.exec-node-detail, .exec-history { margin: 22px 0; border-top: 1px solid #38505b; padding-top: 16px; }
++.exec-node-detail pre, .exec-history pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 360px; overflow: auto; font: 12px/1.6 monospace; margin: 15px 0; }
++.exec-history>div { padding: 14px 0; border-bottom: 1px solid #38505b; font-size: 12px; }
++@media(max-width:900px) { .exec-layout { grid-template-columns: minmax(0,1fr); } .exec-variables { border-left: 0; border-top: 1px solid #38505b; padding: 16px 0; } .exec-workspace { padding: 16px; } }
+diff --git a/apps/web/src/parserClient.test.ts b/apps/web/src/parserClient.test.ts
+new file mode 100644
+index 0000000..9c74020
+--- /dev/null
++++ b/apps/web/src/parserClient.test.ts
+@@ -0,0 +1,27 @@
++import { afterEach, expect, it, vi } from 'vitest';
++import { importParserBundle, parserRequest, readSemanticGraph } from './parserClient';
++
++afterEach(() => vi.unstubAllGlobals());
++
++it('uploads exact transfer bytes with a matching hash and separate parser identities', async () => {
++  const bytes = new TextEncoder().encode('transfer bytes').buffer;
++  const fetcher = vi.fn().mockResolvedValueOnce({ ok: true, json: async () => ({ project: { id: 'parser-project' } }) }).mockResolvedValueOnce({ ok: true, json: async () => ({ import_id: 'parser-import' }) });
++  vi.stubGlobal('fetch', fetcher);
++  await expect(importParserBundle(bytes, 'Archive', new AbortController().signal)).resolves.toEqual({ projectId: 'parser-project', importId: 'parser-import' });
++  expect(fetcher.mock.calls[1][0]).toBe('/parser-api/projects/parser-project/imports');
++  const request = fetcher.mock.calls[1][1];
++  expect(request.body).toBe(bytes);
++  expect(request.headers['Idempotency-Key']).toBe(`sha256:${request.headers['X-AiCA-Bundle-SHA256']}`);
++  expect(request.headers['X-AiCA-Bundle-SHA256']).toHaveLength(64);
++  expect(request.headers.Authorization).toBeUndefined();
++});
++
++it('preserves backend error codes instead of presenting a successful graph', async () => {
++  vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 409, json: async () => ({ code: 'analysis_input_conflict', message: 'Input changed' }) }));
++  await expect(parserRequest('/projects/p/semantic-parses')).rejects.toThrow('analysis_input_conflict: Input changed');
++});
++
++it.each([{ executable: true, import_id: 'i' }, { executable: false, import_id: 'wrong' }])('rejects unexpected executable or source contracts: %j', async value => {
++  vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({ graph: { format: 'aica-semantic-graph/0.1', executable: value.executable, source: { import_id: value.import_id } } }) }));
++  await expect(readSemanticGraph({ projectId: 'p', importId: 'i' }, { id: 'parse', state: 'succeeded', graph_id: 'g', revision_id: 'r', error_code: null, usage: null }, new AbortController().signal)).rejects.toThrow('contract or source');
++});
+diff --git a/apps/web/src/parserClient.ts b/apps/web/src/parserClient.ts
+new file mode 100644
+index 0000000..5b162f5
+--- /dev/null
++++ b/apps/web/src/parserClient.ts
+@@ -0,0 +1,30 @@
++import type { GraphDocument } from '../../../packages/runtime/design/graph-v0.1/graph.generated';
++
++export type ParserSelection = { projectId: string; importId: string };
++export type ParseJob = { id: string; state: string; graph_id: string | null; revision_id: string | null; error_code: string | null; usage: unknown };
++export type PreparedInput = { input_sha256: string; facts: unknown[]; source_node_ids: string[]; coverage?: unknown };
++
++export async function parserRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
++  const response = await fetch(`/parser-api${path}`, init);
++  const body = await response.json();
++  if (!response.ok) throw new Error(`${body.code || response.status}: ${body.message || 'Parser request failed'}`);
++  return body as T;
++}
++
++export const parserJson = (body: unknown, signal?: AbortSignal): RequestInit => ({ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal });
++
++export async function importParserBundle(bytes: ArrayBuffer, title: string, signal: AbortSignal): Promise<ParserSelection> {
++  const hash = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)), byte => byte.toString(16).padStart(2, '0')).join('');
++  const { project } = await parserRequest<{ project: { id: string } }>('/projects', parserJson({ title: title.slice(0, 200) || 'Imported archive' }, signal));
++  const receipt = await parserRequest<{ import_id: string }>(`/projects/${project.id}/imports`, {
++    method: 'POST', signal, body: bytes, headers: { 'Content-Type': 'application/vnd.aica.bundle+zip', 'X-AiCA-Bundle-SHA256': hash, 'Idempotency-Key': `sha256:${hash}` },
++  });
++  return { projectId: project.id, importId: receipt.import_id };
++}
++
++export async function readSemanticGraph(selection: ParserSelection, job: ParseJob, signal: AbortSignal): Promise<GraphDocument> {
++  if (!job.graph_id || !job.revision_id) throw new Error('This parse has no completed graph');
++  const { graph } = await parserRequest<{ graph: GraphDocument }>(`/projects/${selection.projectId}/semantic-graphs/${encodeURIComponent(job.graph_id)}?revision_id=${encodeURIComponent(job.revision_id)}`, { signal });
++  if (graph.format !== 'aica-semantic-graph/0.1' || graph.executable !== false || graph.source.import_id !== selection.importId) throw new Error('Unexpected semantic graph contract or source');
++  return graph;
++}
+diff --git a/apps/web/src/preview-service.test.ts b/apps/web/src/preview-service.test.ts
+index 8ac1f92..df61e8e 100644
+--- a/apps/web/src/preview-service.test.ts
++++ b/apps/web/src/preview-service.test.ts
+@@ -5,6 +5,19 @@ import { exampleProjects } from './workspace';
+ const module = { ...exampleProjects[0].workflow.modules[2], prompt: '银蓝色月光', model: '' };
+ afterEach(() => { vi.unstubAllGlobals(); });
+ describe('preview gateway boundary', () => {
++  it('passes session settings to the internal gateway and preserves truthful source', async () => {
++    const fetcher = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ artifact: { url: '/runtime-api/preview-artifacts/' + 'a'.repeat(64), mime: 'image/png' }, metadata: { source: 'live_api' } }) }); vi.stubGlobal('fetch', fetcher);
++    const result = await modulePreviewService.generate({ projectId: 'p', module: { ...module, kind: 'image' }, stage: 'draft', settings: { ...defaultSettings, image: { provider: 'sdcpp', model: 'local-model', apiBase: 'http://local.invalid/v1/images/generations', timeoutSeconds: 180, allowFallback: false } }, credentials: { image: 'session-key', video: '' }, signal: new AbortController().signal });
++    expect(fetcher.mock.calls[0][0]).toBe('/runtime-api/previews');
++    expect(JSON.parse(fetcher.mock.calls[0][1].body).image_config).toMatchObject({ provider: 'sdcpp', model: 'local-model', api_key: 'session-key', timeout_seconds: 180, allow_fallback: false });
++    expect(fetcher.mock.calls[0][1].headers.Authorization).toBeUndefined();
++    expect(result.source).toBe('live_api'); expect(JSON.stringify(result)).not.toContain('session-key');
++  });
++  it('does not turn arbitrary text nodes into image generators', async () => {
++    const fetcher = vi.fn(); vi.stubGlobal('fetch', fetcher);
++    await expect(modulePreviewService.generate({ projectId: 'p', module: { ...module, kind: 'text', mode: 'text' }, stage: 'draft', settings: defaultSettings, credentials: { image: 'key', video: '' }, signal: new AbortController().signal })).rejects.toThrow('未声明');
++    expect(fetcher).not.toHaveBeenCalled();
++  });
+   it('passes the edited module and default model to the configured gateway without putting the key in the payload', async () => {
+     const fetcher = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ artifact: { url: 'https://example.com/result.png', mime: 'image/png' } }) }); vi.stubGlobal('fetch', fetcher);
+     const result = await modulePreviewService.generate({ projectId: 'p', module, stage: 'draft', settings: { ...defaultSettings, previewEndpoint: 'http://127.0.0.1:8000/preview' }, credentials: { image: 'test-session-key', video: '' }, signal: new AbortController().signal });
+diff --git a/apps/web/src/preview-service.ts b/apps/web/src/preview-service.ts
+index b183511..8ce9616 100644
+--- a/apps/web/src/preview-service.ts
++++ b/apps/web/src/preview-service.ts
+@@ -1,5 +1,5 @@
+ import type { AppSettings, ModelCredentials } from './settings';
+-import { validEndpoint } from './settings';
++import { imageProviderConfig, validEndpoint } from './settings';
+ import { safeMedia, type WorkflowModule } from './workflow';
+ import type { ModulePreview } from './workspace';
+ 
+@@ -7,12 +7,19 @@ export interface PreviewRequest { projectId: string; module: WorkflowModule; sta
+ export interface ModulePreviewService { generate(request: PreviewRequest): Promise<ModulePreview> }
+ export const modulePreviewService: ModulePreviewService = {
+   async generate({ projectId, module, stage, settings, credentials, signal }) {
++    if (!/image|video|txt2img|img2img/i.test(module.kind + ' ' + module.mode)) throw new Error('当前模块未声明图像或视频生成模式，请在可执行档案中使用对应的已注册工具。');
+     const kind = /video/i.test(module.kind + module.mode) ? 'video' : 'image'; const config = settings[kind];
+     const model = module.model || config.model;
+     if (!module.prompt.trim()) throw new Error('请先填写模块提示词。');
+     if (!settings.previewEndpoint) {
+-      await new Promise<void>((resolve, reject) => { const abort = () => { clearTimeout(timer); reject(new DOMException('Aborted', 'AbortError')); }; const timer = setTimeout(() => { signal.removeEventListener('abort', abort); resolve(); }, 900); if (signal.aborted) abort(); else signal.addEventListener('abort', abort, { once: true }); });
+-      return { nodeId: module.id, prompt: module.prompt, model, stage, simulated: true, createdAt: Date.now() };
++      if (kind !== 'image') throw new Error('尚未注册生视频适配器，未调用模型。');
++      const imageConfig = imageProviderConfig(settings, credentials);
++      if (!imageConfig) throw new Error('请先填写 API Key，或明确选择 Local Fallback 离线预览。');
++      const response = await fetch('/runtime-api/previews', { method: 'POST', signal, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ project_id: projectId, node_id: module.id, prompt: module.prompt, kind, stage, params: module.params || {}, image_config: { ...imageConfig, model: module.model || imageConfig.model } }) });
++      const body = await response.json();
++      if (!response.ok) throw new Error(body.message || body.detail || `Preview HTTP ${response.status}`);
++      if (!body.artifact?.url?.startsWith('/runtime-api/preview-artifacts/') || !/^image\//.test(body.artifact.mime)) throw new Error('无效的预览产物');
++      return { nodeId: module.id, prompt: module.prompt, model, stage, simulated: false, artifact: { uri: body.artifact.url, mime: body.artifact.mime }, source: body.metadata.source, createdAt: Date.now() };
+     }
+     if (!validEndpoint(settings.previewEndpoint)) throw new Error('请在我的设置中填写有效的预览网关 URL。');
+     const response = await fetch(settings.previewEndpoint, { method: 'POST', signal, headers: { 'Content-Type': 'application/json', ...(credentials[kind] ? { Authorization: `Bearer ${credentials[kind]}` } : {}) }, body: JSON.stringify({ project_id: projectId, node_id: module.id, prompt: module.prompt, model, kind, stage, mode: module.mode, harness: module.harness, params: module.params, provider: config.provider, api_base: config.apiBase }) });
+diff --git a/apps/web/src/semantic.css b/apps/web/src/semantic.css
+new file mode 100644
+index 0000000..bdbd3f7
+--- /dev/null
++++ b/apps/web/src/semantic.css
+@@ -0,0 +1,18 @@
++.semantic-review { border-top: 1px solid #456063; margin: 28px 0; padding-top: 20px; min-width: 0; }
++.semantic-review header, .semantic-toolbar, .semantic-history { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
++.semantic-review header { justify-content: space-between; margin-bottom: 16px; }
++.semantic-review h2 { display: flex; gap: 8px; align-items: center; margin: 0 0 8px; font-size: 18px; }
++.semantic-review p, .semantic-review header>span { font-size: 12px; line-height: 1.7; color: #bccdcc; }
++.semantic-review .button { font-size: 12px; padding: 8px 12px; max-width: 100%; overflow-wrap: anywhere; }
++.semantic-review details, .semantic-step { border-top: 1px solid #385157; margin-top: 16px; padding-top: 14px; }
++.semantic-review pre { max-height: 320px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; font: 12px/1.6 monospace; background: #101e22; padding: 14px; margin: 12px 0; }
++.semantic-review .semantic-identity { overflow-wrap: anywhere; font: 11px/1.6 monospace; margin: 14px 0; }
++.semantic-consent { display: flex; align-items: start; gap: 8px; font-size: 12px; margin: 16px 0; }
++.semantic-canvas { width: 100%; height: 440px; margin: 20px 0; background: #101e22; border: 1px solid #385157; }
++.semantic-canvas strong { font-size: 14px; display: block; }
++.semantic-canvas small { display: block; font-size: 11px; margin-top: 8px; }
++.semantic-review input[type=file] { width: 1px; position: absolute; opacity: 0; }
++.semantic-step h3 { font-size: 16px; }
++.semantic-scope { border: 1px solid #385157; margin: 16px 0; padding: 12px; min-width: 0; font-size: 12px; }
++.semantic-scope label { display: flex; gap: 8px; align-items: start; overflow-wrap: anywhere; margin: 8px 0; }
++.semantic-scope>div { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 0 12px; }
+diff --git a/apps/web/src/settings.test.ts b/apps/web/src/settings.test.ts
+new file mode 100644
+index 0000000..3c358f2
+--- /dev/null
++++ b/apps/web/src/settings.test.ts
+@@ -0,0 +1,22 @@
++import { afterEach, expect, it, vi } from 'vitest';
++import { defaultSettings, imageProviderConfig, readSettings, saveSettings } from './settings';
++
++afterEach(() => vi.unstubAllGlobals());
++
++it('maps the selected endpoint and stage models without persisting the key', () => {
++  const entries = new Map<string, string>();
++  vi.stubGlobal('localStorage', { getItem: (key: string) => entries.get(key) ?? null, setItem: (key: string, value: string) => entries.set(key, value) });
++  const settings = { ...defaultSettings, image: { provider: 'sdcpp', apiBase: 'http://local.invalid/v1/images/generations', model: 'local-model', draftModel: 'draft-model', hqModel: 'final-model', timeoutSeconds: 180, allowFallback: false } };
++  saveSettings(settings);
++  expect(imageProviderConfig(readSettings(), { image: 'session-only-key', video: '' })).toEqual({ provider: 'sdcpp', api_base: settings.image.apiBase, api_key: 'session-only-key', model: 'local-model', draft_model: 'draft-model', hq_model: 'final-model', timeout_seconds: 180, allow_fallback: false });
++  expect([...entries.values()].join('')).not.toContain('session-only-key');
++});
++
++it('requires a session key for live API and permits explicitly selected offline mode', () => {
++  expect(imageProviderConfig(defaultSettings, { image: '', video: '' })).toBeUndefined();
++  expect(imageProviderConfig({ ...defaultSettings, image: { ...defaultSettings.image, provider: 'local_fallback' } }, { image: '', video: '' })?.provider).toBe('local_fallback');
++});
++
++it('preserves the default ten second deadline', () => {
++  expect(imageProviderConfig(defaultSettings, { image: 'session-key', video: '' })?.timeout_seconds).toBe(10);
++});
+diff --git a/apps/web/src/settings.ts b/apps/web/src/settings.ts
+index 5add1b3..e6c171f 100644
+--- a/apps/web/src/settings.ts
++++ b/apps/web/src/settings.ts
+@@ -1,11 +1,19 @@
+-export type ModelConfig = { provider: string; model: string; apiBase: string };
++import type { ImageProviderConfig } from '@aica/artifact-renderers';
++export type ModelConfig = { provider: string; model: string; apiBase: string; draftModel?: string; hqModel?: string; timeoutSeconds?: number; allowFallback?: boolean };
+ export type AppSettings = { displayName: string; autoSave: boolean; highlightWords: boolean; image: ModelConfig; video: ModelConfig; previewEndpoint: string };
+ export const defaultSettings: AppSettings = { displayName: 'Creator', autoSave: true, highlightWords: true, image: { provider: 'qwen', model: 'qwen-image', apiBase: 'https://dashscope.aliyuncs.com/api/v1' }, video: { provider: 'custom', model: '', apiBase: '' }, previewEndpoint: '' };
+ const key = 'aica.settings.v1';
+ export function readSettings(): AppSettings {
+   try { const v = JSON.parse(localStorage.getItem(key) ?? 'null'); return v ? { ...defaultSettings, displayName: typeof v.displayName === 'string' ? v.displayName.slice(0, 40) : 'Creator', autoSave: typeof v.autoSave === 'boolean' ? v.autoSave : true, highlightWords: typeof v.highlightWords === 'boolean' ? v.highlightWords : true, image: config(v.image, defaultSettings.image), video: config(v.video, defaultSettings.video), previewEndpoint: typeof v.previewEndpoint === 'string' ? v.previewEndpoint : '' } : structuredClone(defaultSettings); } catch { return structuredClone(defaultSettings); }
+ }
+-function config(value: any, base: ModelConfig): ModelConfig { return { provider: typeof value?.provider === 'string' ? value.provider : base.provider, model: typeof value?.model === 'string' ? value.model : base.model, apiBase: typeof value?.apiBase === 'string' ? value.apiBase : base.apiBase }; }
++function config(value: any, base: ModelConfig): ModelConfig { return { provider: typeof value?.provider === 'string' ? value.provider : base.provider, model: typeof value?.model === 'string' ? value.model : base.model, apiBase: typeof value?.apiBase === 'string' ? value.apiBase : base.apiBase, draftModel: typeof value?.draftModel === 'string' ? value.draftModel : '', hqModel: typeof value?.hqModel === 'string' ? value.hqModel : '', timeoutSeconds: typeof value?.timeoutSeconds === 'number' && value.timeoutSeconds > 0 && value.timeoutSeconds <= 300 ? value.timeoutSeconds : 10, allowFallback: typeof value?.allowFallback === 'boolean' ? value.allowFallback : true }; }
+ export function saveSettings(settings: AppSettings) { localStorage.setItem(key, JSON.stringify({ displayName: settings.displayName, autoSave: settings.autoSave, highlightWords: settings.highlightWords, image: config(settings.image, defaultSettings.image), video: config(settings.video, defaultSettings.video), previewEndpoint: settings.previewEndpoint })); }
+ export function validEndpoint(value: string) { if (!value) return true; try { const url = new URL(value); return ['https:', 'http:'].includes(url.protocol) && !url.username && !url.password && !url.search && !url.hash; } catch { return false; } }
+ export type ModelCredentials = { image: string; video: string };
++
++export function imageProviderConfig(settings: AppSettings, credentials: ModelCredentials): ImageProviderConfig | undefined {
++  const image = settings.image;
++  if (image.provider !== 'local_fallback' && !credentials.image) return undefined;
++  if (!['custom', 'openai', 'siliconflow', 'fal', 'qwen', 'sdcpp', 'local_fallback'].includes(image.provider)) throw new Error('请选择受支持的生图接口协议');
++  return { provider: image.provider as ImageProviderConfig['provider'], api_base: image.apiBase, api_key: credentials.image, model: image.model, draft_model: image.draftModel || '', hq_model: image.hqModel || '', timeout_seconds: image.timeoutSeconds || 10, allow_fallback: image.allowFallback ?? true };
++}
+diff --git a/apps/web/src/workflow.ts b/apps/web/src/workflow.ts
+index 7ba6a27..bd1672c 100644
+--- a/apps/web/src/workflow.ts
++++ b/apps/web/src/workflow.ts
+@@ -21,7 +21,7 @@ export function redact(value: unknown, depth = 0): any {
+   return value;
+ }
+ export function displayValue(value: unknown): string { return typeof value === 'string' ? value : value == null ? '' : JSON.stringify(value, null, 2); }
+-export function safeMedia(uri: string, mime = '') { return /^https?:\/\//i.test(uri) || (/^data:image\/(png|jpeg|webp);base64,/i.test(uri) && mime.startsWith('image/')); }
++export function safeMedia(uri: string, mime = '') { return /^https?:\/\//i.test(uri) || /^\/runtime-api\/preview-artifacts\/[a-f0-9]{64}$/.test(uri) || (/^data:image\/(png|jpeg|webp);base64,/i.test(uri) && mime.startsWith('image/')); }
+ export function parseWorkflow(text: string): { title: string; description: string; workflow: Workflow } {
+   if (new Blob([text]).size > 5 * 1024 * 1024) throw new Error('文件不能超过 5 MB。');
+   let parsed: unknown; try { parsed = JSON.parse(text.replace(/^\uFEFF/, '')); } catch { throw new Error('不是有效的 JSON 文件，请上传 MCP 已解析的 .aica 或 JSON。'); }
+diff --git a/apps/web/src/workspace.ts b/apps/web/src/workspace.ts
+index ab42f4f..09ced7d 100644
+--- a/apps/web/src/workspace.ts
++++ b/apps/web/src/workspace.ts
+@@ -3,7 +3,7 @@ import { readCreations } from './creations';
+ import { demoWorkflow, redact, type Workflow } from './workflow';
+ import { initialAnswers, type Answers, type Values } from './demo';
+ 
+-export type ModulePreview = { nodeId: string; prompt: string; model: string; stage: 'draft' | 'final'; simulated: boolean; artifact?: { uri: string; mime: string }; createdAt: number };
++export type ModulePreview = { nodeId: string; prompt: string; model: string; stage: 'draft' | 'final'; simulated: boolean; artifact?: { uri: string; mime: string }; source?: string; createdAt: number };
+ export type WorkspaceProject = CommunityProject & { workflow: Workflow; branch?: string; owned?: boolean; parentId?: string; status?: 'draft' | 'published'; updatedAt?: number; preview?: ModulePreview; basePrompts?: Record<string, string>; baseModels?: Record<string, string>; remix?: { baseValues: Values; answers: Answers } };
+ const key = 'aica.workspace.v1';
+ export const exampleProjects: WorkspaceProject[] = projects.map(project => ({ ...project, workflow: demoWorkflow(project) }));
+diff --git a/apps/web/vite.config.ts b/apps/web/vite.config.ts
+index 56f7628..43e80f9 100644
+--- a/apps/web/vite.config.ts
++++ b/apps/web/vite.config.ts
+@@ -1,4 +1,32 @@
+-import { defineConfig } from 'vite';
++import { defineConfig, loadEnv } from 'vite';
+ import react from '@vitejs/plugin-react';
+ 
+-export default defineConfig({ plugins: [react()] });
++export default defineConfig(({ mode }) => {
++  const env = loadEnv(mode, '.', 'AICA_');
++  const runtime = env.AICA_BACKEND_URL || 'http://127.0.0.1:8014';
++  const platform = env.AICA_PARSER_URL || 'http://127.0.0.1:8025';
++  const token = env.AICA_LOCAL_API_TOKEN;
++  for (const target of [runtime, platform]) {
++    const address = new URL(target);
++    if (token && (!['127.0.0.1', 'localhost', '[::1]'].includes(address.hostname) || address.pathname !== '/' || address.username || address.password || address.search || address.hash)) throw new Error('Local proxy requires a loopback backend origin');
++  }
++  return { plugins: [react(), {
++    name: 'local-runtime-authorization',
++    configureServer(server) {
++      server.middlewares.use((request, response, next) => {
++        const local = request as unknown as { url?: string; headers: Record<string, string | string[] | undefined>; socket: { remoteAddress?: string; localPort?: number } };
++        if (!local.url?.startsWith('/runtime-api') && !local.url?.startsWith('/parser-api')) return next();
++        const host = local.headers.host, remote = local.socket.remoteAddress;
++        if (typeof host !== 'string' || !/^(localhost|127\.0\.0\.1|\[::1\]):\d+$/.test(host) || !['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(remote || '') || Number(new URL(`http://${host}`).port) !== local.socket.localPort || (local.headers.origin && local.headers.origin !== `http://${host}`) || local.headers['sec-fetch-site'] === 'cross-site') {
++          response.statusCode = 403; response.end('Same-origin loopback requests only'); return;
++        }
++        if (token) local.headers.authorization = `Bearer ${token}`;
++        next();
++      });
++    },
++  }], resolve: { dedupe: ['react', 'react-dom'] }, server: { host: '127.0.0.1', fs: { allow: ['../..'] }, proxy: {
++    '/api': { target: platform, changeOrigin: true },
++    '/runtime-api': { target: runtime, changeOrigin: true, rewrite: path => path.replace(/^\/runtime-api/, '/api') },
++    '/parser-api': { target: platform, changeOrigin: true, rewrite: path => path.replace(/^\/parser-api/, '/api') },
++  } } };
++});

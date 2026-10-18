@@ -1,0 +1,18 @@
+.semantic-review { border-top: 1px solid #456063; margin: 28px 0; padding-top: 20px; min-width: 0; }
+.semantic-review header, .semantic-toolbar, .semantic-history { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.semantic-review header { justify-content: space-between; margin-bottom: 16px; }
+.semantic-review h2 { display: flex; gap: 8px; align-items: center; margin: 0 0 8px; font-size: 18px; }
+.semantic-review p, .semantic-review header>span { font-size: 12px; line-height: 1.7; color: #bccdcc; }
+.semantic-review .button { font-size: 12px; padding: 8px 12px; max-width: 100%; overflow-wrap: anywhere; }
+.semantic-review details, .semantic-step { border-top: 1px solid #385157; margin-top: 16px; padding-top: 14px; }
+.semantic-review pre { max-height: 320px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; font: 12px/1.6 monospace; background: #101e22; padding: 14px; margin: 12px 0; }
+.semantic-review .semantic-identity { overflow-wrap: anywhere; font: 11px/1.6 monospace; margin: 14px 0; }
+.semantic-consent { display: flex; align-items: start; gap: 8px; font-size: 12px; margin: 16px 0; }
+.semantic-canvas { width: 100%; height: 440px; margin: 20px 0; background: #101e22; border: 1px solid #385157; }
+.semantic-canvas strong { font-size: 14px; display: block; }
+.semantic-canvas small { display: block; font-size: 11px; margin-top: 8px; }
+.semantic-review input[type=file] { width: 1px; position: absolute; opacity: 0; }
+.semantic-step h3 { font-size: 16px; }
+.semantic-scope { border: 1px solid #385157; margin: 16px 0; padding: 12px; min-width: 0; font-size: 12px; }
+.semantic-scope label { display: flex; gap: 8px; align-items: start; overflow-wrap: anywhere; margin: 8px 0; }
+.semantic-scope>div { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 0 12px; }

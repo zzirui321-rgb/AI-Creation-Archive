@@ -1,0 +1,378 @@
+{
+  "agents": [
+    {
+      "client": "synthetic",
+      "harness_id": "fixture-harness",
+      "id": "fixture-agent",
+      "model": {},
+      "parent_agent_id": null,
+      "session_id": "fixture-session"
+    }
+  ],
+  "aica_version": "0.1",
+  "artifacts": [
+    {
+      "availability": "available",
+      "id": "fixture-history",
+      "mime_type": "application/x-ndjson",
+      "producer_node_id": null,
+      "producer_run_id": null,
+      "sha256": "22e4bd6fd8a6b0c73a76db2d04dbb5a171dae2f1d5bcb86743c5116566ef3305",
+      "size": 1464,
+      "uri": "events.jsonl"
+    },
+    {
+      "availability": "unverified",
+      "id": "artifact-raw-character-revised",
+      "mime_type": "image/png",
+      "producer_node_id": "raw-character-revised",
+      "producer_run_id": "run-raw-character-revised",
+      "sha256": null,
+      "uri": "outputs/raw-character-revised.bin"
+    },
+    {
+      "availability": "unverified",
+      "id": "artifact-raw-panel",
+      "mime_type": "image/png",
+      "producer_node_id": "raw-panel",
+      "producer_run_id": "run-raw-panel",
+      "sha256": null,
+      "uri": "outputs/raw-panel.bin"
+    },
+    {
+      "availability": "unverified",
+      "id": "artifact-raw-audio",
+      "mime_type": "audio/wav",
+      "producer_node_id": "raw-audio",
+      "producer_run_id": "run-raw-audio",
+      "sha256": null,
+      "uri": "outputs/raw-audio.bin"
+    }
+  ],
+  "extensions": {
+    "aica.fixture": true
+  },
+  "graph": {
+    "branches": [
+      {
+        "id": "main",
+        "parent_id": null,
+        "state": "active"
+      }
+    ],
+    "edges": [
+      {
+        "id": "raw-character-panel",
+        "kind": "data",
+        "source": "raw-character-revised",
+        "source_output": "image",
+        "target": "raw-panel",
+        "target_input": "reference_image"
+      }
+    ],
+    "golden_path": [],
+    "nodes": [
+      {
+        "branch_id": "main",
+        "id": "raw-plan",
+        "kind": "prompt",
+        "label": "创作要求",
+        "provenance": {
+          "evidence": [
+            {
+              "source": "synthetic-contract-fixture"
+            }
+          ],
+          "mode": "recorded"
+        }
+      },
+      {
+        "branch_id": "main",
+        "execution": {
+          "inputs": {
+            "arguments": {
+              "kind": "literal",
+              "value": "{\"prompt\":\"黑猫宇航员，水彩风格\",\"seed\":42}"
+            }
+          },
+          "kind": "mcp",
+          "outputs": [
+            "image"
+          ],
+          "params": {},
+          "tool": "image.generate",
+          "version": "fixture-1"
+        },
+        "id": "raw-character-first",
+        "kind": "model",
+        "label": "image.generate",
+        "provenance": {
+          "evidence": [
+            {
+              "source": "synthetic-contract-fixture"
+            }
+          ],
+          "mode": "recorded"
+        }
+      },
+      {
+        "branch_id": "main",
+        "execution": {
+          "inputs": {
+            "arguments": {
+              "kind": "literal",
+              "value": "{\"prompt\":\"黑猫宇航员，红色宇航服，水彩风格\",\"seed\":42}"
+            }
+          },
+          "kind": "mcp",
+          "outputs": [
+            "image"
+          ],
+          "params": {},
+          "tool": "image.generate",
+          "version": "fixture-1"
+        },
+        "id": "raw-character-revised",
+        "kind": "model",
+        "label": "image.generate",
+        "provenance": {
+          "evidence": [
+            {
+              "source": "synthetic-contract-fixture"
+            }
+          ],
+          "mode": "recorded"
+        }
+      },
+      {
+        "branch_id": "main",
+        "execution": {
+          "inputs": {
+            "arguments": {
+              "kind": "literal",
+              "value": "{\"prompt\":\"用选定角色图画月球分镜\",\"seed\":42}"
+            },
+            "reference_image": {
+              "kind": "node_output",
+              "node_id": "raw-character-revised",
+              "output": "image"
+            }
+          },
+          "kind": "mcp",
+          "outputs": [
+            "image"
+          ],
+          "params": {},
+          "tool": "comic.panel",
+          "version": "fixture-1"
+        },
+        "id": "raw-panel",
+        "kind": "model",
+        "label": "comic.panel",
+        "provenance": {
+          "evidence": [
+            {
+              "source": "synthetic-contract-fixture"
+            }
+          ],
+          "mode": "recorded"
+        }
+      },
+      {
+        "branch_id": "main",
+        "execution": {
+          "inputs": {
+            "arguments": {
+              "kind": "literal",
+              "value": "{\"prompt\":\"太空氛围配乐\",\"seed\":42}"
+            }
+          },
+          "kind": "mcp",
+          "outputs": [
+            "audio"
+          ],
+          "params": {},
+          "tool": "audio.generate",
+          "version": "fixture-1"
+        },
+        "id": "raw-audio",
+        "kind": "model",
+        "label": "audio.generate",
+        "provenance": {
+          "evidence": [
+            {
+              "source": "synthetic-contract-fixture"
+            }
+          ],
+          "mode": "recorded"
+        }
+      }
+    ],
+    "parent_revision_id": null,
+    "revision_id": "raw-revision-1"
+  },
+  "harnesses": [
+    {
+      "availability": {},
+      "config": {},
+      "id": "fixture-harness",
+      "name": "Synthetic only",
+      "state": {},
+      "version": null
+    }
+  ],
+  "history": [
+    {
+      "artifact_id": "fixture-history",
+      "kind": "events",
+      "through_seq": 4
+    }
+  ],
+  "interactive_questions": [],
+  "metadata": {
+    "created_at": "2026-10-17T00:00:00Z",
+    "external_links": [],
+    "project_id": "fixture-project",
+    "source_mode": "live_recorded",
+    "title": "Synthetic graph contract case",
+    "updated_at": "2026-10-17T00:10:00Z"
+  },
+  "runs": [
+    {
+      "agent_id": "fixture-agent",
+      "artifact_ids": [],
+      "ended_at": "2026-10-17T00:02:20Z",
+      "harness_id": "fixture-harness",
+      "id": "run-raw-character-first",
+      "inputs": {},
+      "node_id": "raw-character-first",
+      "outputs": {},
+      "provenance": {
+        "evidence": [
+          {
+            "source": "synthetic-contract-fixture"
+          }
+        ],
+        "mode": "recorded"
+      },
+      "revision_id": "raw-revision-1",
+      "session_id": "fixture-session",
+      "started_at": "2026-10-17T00:02:10Z",
+      "state": "failed",
+      "trace_id": "fixture-trace"
+    },
+    {
+      "agent_id": "fixture-agent",
+      "artifact_ids": [
+        "artifact-raw-character-revised"
+      ],
+      "ended_at": "2026-10-17T00:03:20Z",
+      "harness_id": "fixture-harness",
+      "id": "run-raw-character-revised",
+      "inputs": {},
+      "node_id": "raw-character-revised",
+      "outputs": {
+        "image": {
+          "artifact_id": "artifact-raw-character-revised"
+        }
+      },
+      "provenance": {
+        "evidence": [
+          {
+            "source": "synthetic-contract-fixture"
+          }
+        ],
+        "mode": "recorded"
+      },
+      "revision_id": "raw-revision-1",
+      "session_id": "fixture-session",
+      "started_at": "2026-10-17T00:03:10Z",
+      "state": "succeeded",
+      "trace_id": "fixture-trace"
+    },
+    {
+      "agent_id": "fixture-agent",
+      "artifact_ids": [
+        "artifact-raw-panel"
+      ],
+      "ended_at": "2026-10-17T00:04:20Z",
+      "harness_id": "fixture-harness",
+      "id": "run-raw-panel",
+      "inputs": {},
+      "node_id": "raw-panel",
+      "outputs": {
+        "image": {
+          "artifact_id": "artifact-raw-panel"
+        }
+      },
+      "provenance": {
+        "evidence": [
+          {
+            "source": "synthetic-contract-fixture"
+          }
+        ],
+        "mode": "recorded"
+      },
+      "revision_id": "raw-revision-1",
+      "session_id": "fixture-session",
+      "started_at": "2026-10-17T00:04:10Z",
+      "state": "succeeded",
+      "trace_id": "fixture-trace"
+    },
+    {
+      "agent_id": "fixture-agent",
+      "artifact_ids": [
+        "artifact-raw-audio"
+      ],
+      "ended_at": "2026-10-17T00:05:20Z",
+      "harness_id": "fixture-harness",
+      "id": "run-raw-audio",
+      "inputs": {},
+      "node_id": "raw-audio",
+      "outputs": {
+        "audio": {
+          "artifact_id": "artifact-raw-audio"
+        }
+      },
+      "provenance": {
+        "evidence": [
+          {
+            "source": "synthetic-contract-fixture"
+          }
+        ],
+        "mode": "recorded"
+      },
+      "revision_id": "raw-revision-1",
+      "session_id": "fixture-session",
+      "started_at": "2026-10-17T00:05:10Z",
+      "state": "succeeded",
+      "trace_id": "fixture-trace"
+    }
+  ],
+  "sessions": [
+    {
+      "consent": {
+        "decided_at": "2026-10-17T00:00:00Z",
+        "include_children": false,
+        "record": true
+      },
+      "created_at": "2026-10-17T00:00:00Z",
+      "id": "fixture-session",
+      "state": "closed"
+    }
+  ],
+  "snapshot": {
+    "commit_seq": 4,
+    "complete": false,
+    "gaps": [
+      {
+        "code": "source_sequence_gap",
+        "source_id": "other-agent"
+      }
+    ],
+    "snapshot_id": "fixture-snapshot",
+    "stream_id": "fixture-stream"
+  },
+  "variable_operations": [],
+  "variables": {}
+}

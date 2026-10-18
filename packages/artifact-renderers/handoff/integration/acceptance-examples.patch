@@ -1,0 +1,1220 @@
+diff --git a/examples/ai-comic/ai-comic.aica.json b/examples/ai-comic/ai-comic.aica.json
+new file mode 100644
+--- /dev/null
++++ b/examples/ai-comic/ai-comic.aica.json
+@@ -0,0 +1,490 @@
++{
++  "agents": [],
++  "aica_version": "0.1",
++  "artifacts": [],
++  "extensions": {
++    "aica.acceptance": {
++      "synthetic": true
++    }
++  },
++  "graph": {
++    "branches": [
++      {
++        "id": "main",
++        "parent_id": null,
++        "state": "active"
++      }
++    ],
++    "edges": [
++      {
++        "id": "story-character-brief",
++        "kind": "data",
++        "source": "story",
++        "source_output": "out",
++        "target": "character",
++        "target_input": "brief"
++      },
++      {
++        "id": "character-panel_1-reference_artifact_ids",
++        "kind": "data",
++        "source": "character",
++        "source_output": "out",
++        "target": "panel_1",
++        "target_input": "reference_artifact_ids"
++      },
++      {
++        "id": "character-panel_2-reference_artifact_ids",
++        "kind": "data",
++        "source": "character",
++        "source_output": "out",
++        "target": "panel_2",
++        "target_input": "reference_artifact_ids"
++      },
++      {
++        "id": "panel_1-layout-left",
++        "kind": "data",
++        "source": "panel_1",
++        "source_output": "out",
++        "target": "layout",
++        "target_input": "left"
++      },
++      {
++        "id": "panel_2-layout-right",
++        "kind": "data",
++        "source": "panel_2",
++        "source_output": "out",
++        "target": "layout",
++        "target_input": "right"
++      },
++      {
++        "id": "music-layout-audio_note",
++        "kind": "data",
++        "source": "music",
++        "source_output": "out",
++        "target": "layout",
++        "target_input": "audio_note"
++      }
++    ],
++    "golden_path": [],
++    "nodes": [
++      {
++        "branch_id": "main",
++        "execution": {
++          "inputs": {
++            "content": {
++              "kind": "literal",
++              "value": "A traveler discovers a signal."
++            }
++          },
++          "kind": "model",
++          "outputs": [
++            "out"
++          ],
++          "params": {
++            "seed": 410
++          },
++          "tool": "text_materialize",
++          "version": "b-generic-3"
++        },
++        "id": "story",
++        "kind": "model",
++        "label": "Story",
++        "provenance": {
++          "evidence": [
++            {
++              "source": "Synthetic acceptance fixture / story"
++            }
++          ],
++          "mode": "recorded"
++        }
++      },
++      {
++        "branch_id": "main",
++        "execution": {
++          "inputs": {
++            "content": {
++              "kind": "variable",
++              "variable_id": "style"
++            }
++          },
++          "kind": "model",
++          "outputs": [
++            "out"
++          ],
++          "params": {
++            "seed": 410
++          },
++          "tool": "text_materialize",
++          "version": "b-generic-3"
++        },
++        "id": "style",
++        "kind": "model",
++        "label": "Style",
++        "provenance": {
++          "evidence": [
++            {
++              "source": "Synthetic acceptance fixture / style"
++            }
++          ],
++          "mode": "recorded"
++        }
++      },
++      {
++        "branch_id": "main",
++        "execution": {
++          "inputs": {
++            "content": {
++              "kind": "literal",
++              "value": "Background audio reference; no generated soundtrack."
++            }
++          },
++          "kind": "model",
++          "outputs": [
++            "out"
++          ],
++          "params": {
++            "seed": 410
++          },
++          "tool": "text_materialize",
++          "version": "b-generic-3"
++        },
++        "id": "music",
++        "kind": "model",
++        "label": "Music",
++        "provenance": {
++          "evidence": [
++            {
++              "source": "Synthetic acceptance fixture / music"
++            }
++          ],
++          "mode": "recorded"
++        }
++      },
++      {
++        "branch_id": "main",
++        "execution": {
++          "inputs": {
++            "brief": {
++              "kind": "node_output",
++              "node_id": "story",
++              "output": "out"
++            },
++            "prompt": {
++              "kind": "template",
++              "template": "{{who}} {{extra}}",
++              "variables": {
++                "extra": "detail",
++                "who": "character"
++              }
++            },
++            "style": {
++              "kind": "variable",
++              "variable_id": "style"
++            }
++          },
++          "kind": "model",
++          "outputs": [
++            "out"
++          ],
++          "params": {
++            "seed": 410
++          },
++          "tool": "image_gen",
++          "version": "b-generic-3"
++        },
++        "id": "character",
++        "kind": "model",
++        "label": "Character",
++        "provenance": {
++          "evidence": [
++            {
++              "source": "Synthetic acceptance fixture / character"
++            }
++          ],
++          "mode": "recorded"
++        }
++      },
++      {
++        "branch_id": "main",
++        "execution": {
++          "inputs": {
++            "prompt": {
++              "kind": "template",
++              "template": "Close shot of {{who}} {{extra}}",
++              "variables": {
++                "extra": "detail",
++                "who": "character"
++              }
++            },
++            "reference_artifact_ids": {
++              "kind": "node_output",
++              "node_id": "character",
++              "output": "out"
++            },
++            "style": {
++              "kind": "variable",
++              "variable_id": "style"
++            }
++          },
++          "kind": "model",
++          "outputs": [
++            "out"
++          ],
++          "params": {
++            "seed": 410
++          },
++          "tool": "image_gen",
++          "version": "b-generic-3"
++        },
++        "id": "panel_1",
++        "kind": "model",
++        "label": "Panel 1",
++        "provenance": {
++          "evidence": [
++            {
++              "source": "Synthetic acceptance fixture / panel_1"
++            }
++          ],
++          "mode": "recorded"
++        }
++      },
++      {
++        "branch_id": "main",
++        "execution": {
++          "inputs": {
++            "prompt": {
++              "kind": "template",
++              "template": "Wide view of {{who}} {{extra}}",
++              "variables": {
++                "extra": "detail",
++                "who": "character"
++              }
++            },
++            "reference_artifact_ids": {
++              "kind": "node_output",
++              "node_id": "character",
++              "output": "out"
++            },
++            "style": {
++              "kind": "variable",
++              "variable_id": "style"
++            }
++          },
++          "kind": "model",
++          "outputs": [
++            "out"
++          ],
++          "params": {
++            "seed": 410
++          },
++          "tool": "image_gen",
++          "version": "b-generic-3"
++        },
++        "id": "panel_2",
++        "kind": "model",
++        "label": "Panel 2",
++        "provenance": {
++          "evidence": [
++            {
++              "source": "Synthetic acceptance fixture / panel_2"
++            }
++          ],
++          "mode": "recorded"
++        }
++      },
++      {
++        "branch_id": "main",
++        "execution": {
++          "inputs": {
++            "audio_note": {
++              "kind": "node_output",
++              "node_id": "music",
++              "output": "out"
++            },
++            "left": {
++              "kind": "node_output",
++              "node_id": "panel_1",
++              "output": "out"
++            },
++            "right": {
++              "kind": "node_output",
++              "node_id": "panel_2",
++              "output": "out"
++            },
++            "title": {
++              "kind": "literal",
++              "value": "Image sequence"
++            }
++          },
++          "kind": "model",
++          "outputs": [
++            "out"
++          ],
++          "params": {
++            "layout": {
++              "direction": "vertical",
++              "input_ports": [
++                "left",
++                "right"
++              ]
++            }
++          },
++          "tool": "layout_compose",
++          "version": "b-generic-3"
++        },
++        "id": "layout",
++        "kind": "composition",
++        "label": "Layout",
++        "provenance": {
++          "evidence": [
++            {
++              "source": "Synthetic acceptance fixture / layout"
++            }
++          ],
++          "mode": "recorded"
++        }
++      }
++    ],
++    "parent_revision_id": null,
++    "revision_id": "078590f6-6586-4375-b55f-1664cd9296ee"
++  },
++  "harnesses": [],
++  "history": [],
++  "interactive_questions": [
++    {
++      "id": "q-character",
++      "modes": [
++        "keep",
++        "override",
++        "append"
++      ],
++      "prompt": "character",
++      "variable_id": "character"
++    },
++    {
++      "id": "q-style",
++      "modes": [
++        "keep",
++        "override",
++        "append"
++      ],
++      "prompt": "style",
++      "variable_id": "style"
++    },
++    {
++      "id": "q-detail",
++      "modes": [
++        "keep",
++        "override",
++        "append"
++      ],
++      "prompt": "detail",
++      "variable_id": "detail"
++    }
++  ],
++  "metadata": {
++    "attribution": "Synthetic acceptance input; not an actual captured creation history",
++    "created_at": "2026-10-17T05:48:02.992922Z",
++    "external_links": [
++      "https://github.com/AiCA-Team/AiCA",
++      "https://www.bilibili.com/",
++      "https://www.youtube.com/",
++      "https://huggingface.co/"
++    ],
++    "project_id": "e7507dc1-2204-41cd-a8c1-fd50c571988f",
++    "source_mode": "mixed",
++    "title": "01 / Neon Samurai - image acceptance",
++    "updated_at": "2026-10-17T05:48:02.992922Z"
++  },
++  "runs": [],
++  "sessions": [],
++  "snapshot": {
++    "commit_seq": 0,
++    "complete": true,
++    "gaps": [],
++    "snapshot_id": "80e5520c-3a9a-4e3a-b21d-5daac7f903e1",
++    "stream_id": "ce609b95-c8c8-41a3-923a-bcab6e3e775c"
++  },
++  "variable_operations": [],
++  "variables": {
++    "character": {
++      "bindings": [
++        {
++          "input": "prompt",
++          "node_id": "character"
++        },
++        {
++          "input": "prompt",
++          "node_id": "panel_1"
++        },
++        {
++          "input": "prompt",
++          "node_id": "panel_2"
++        }
++      ],
++      "default": "silver-haired traveler",
++      "modes": [
++        "keep",
++        "override",
++        "append"
++      ],
++      "separator": ", ",
++      "type": "string",
++      "value": "silver-haired traveler"
++    },
++    "detail": {
++      "bindings": [
++        {
++          "input": "prompt",
++          "node_id": "character"
++        },
++        {
++          "input": "prompt",
++          "node_id": "panel_1"
++        },
++        {
++          "input": "prompt",
++          "node_id": "panel_2"
++        }
++      ],
++      "default": "",
++      "modes": [
++        "keep",
++        "override",
++        "append"
++      ],
++      "separator": ", ",
++      "type": "string",
++      "value": ""
++    },
++    "style": {
++      "bindings": [
++        {
++          "input": "content",
++          "node_id": "style"
++        },
++        {
++          "input": "style",
++          "node_id": "character"
++        },
++        {
++          "input": "style",
++          "node_id": "panel_1"
++        },
++        {
++          "input": "style",
++          "node_id": "panel_2"
++        }
++      ],
++      "default": "dark science fiction",
++      "modes": [
++        "keep",
++        "override",
++        "append"
++      ],
++      "separator": ", ",
++      "type": "string",
++      "value": "dark science fiction"
++    }
++  }
++}
+\ No newline at end of file
+diff --git a/examples/self-archive/self-archive.aica.json b/examples/self-archive/self-archive.aica.json
+new file mode 100644
+--- /dev/null
++++ b/examples/self-archive/self-archive.aica.json
+@@ -0,0 +1,322 @@
++{
++  "agents": [],
++  "aica_version": "0.1",
++  "artifacts": [],
++  "extensions": {
++    "aica.acceptance": {
++      "synthetic": true
++    }
++  },
++  "graph": {
++    "branches": [
++      {
++        "id": "main",
++        "parent_id": null,
++        "state": "active"
++      },
++      {
++        "id": "discarded",
++        "parent_id": "main",
++        "reason": "Historical example: output did not meet the recorded requirements; excluded from replay.",
++        "state": "dead_end"
++      }
++    ],
++    "edges": [
++      {
++        "id": "build_configuration-review_note-configuration",
++        "kind": "data",
++        "source": "build_configuration",
++        "source_output": "out",
++        "target": "review_note",
++        "target_input": "configuration"
++      },
++      {
++        "id": "capture_note-release_report-record",
++        "kind": "data",
++        "source": "capture_note",
++        "source_output": "out",
++        "target": "release_report",
++        "target_input": "record"
++      },
++      {
++        "id": "build_configuration-release_report-config",
++        "kind": "data",
++        "source": "build_configuration",
++        "source_output": "out",
++        "target": "release_report",
++        "target_input": "config"
++      },
++      {
++        "id": "review_note-release_report-review",
++        "kind": "data",
++        "source": "review_note",
++        "source_output": "out",
++        "target": "release_report",
++        "target_input": "review"
++      }
++    ],
++    "golden_path": [],
++    "nodes": [
++      {
++        "branch_id": "main",
++        "execution": {
++          "inputs": {
++            "content": {
++              "kind": "literal",
++              "value": "Synthetic recorded note: define a reusable archive format."
++            }
++          },
++          "kind": "model",
++          "outputs": [
++            "out"
++          ],
++          "params": {
++            "mime_type": "text/markdown"
++          },
++          "tool": "text_materialize",
++          "version": "b-generic-3"
++        },
++        "id": "capture_note",
++        "kind": "model",
++        "label": "Capture Note",
++        "provenance": {
++          "evidence": [
++            {
++              "source": "Synthetic acceptance fixture / capture_note"
++            }
++          ],
++          "mode": "recorded"
++        }
++      },
++      {
++        "branch_id": "main",
++        "execution": {
++          "inputs": {
++            "content": {
++              "kind": "variable",
++              "variable_id": "framework"
++            }
++          },
++          "kind": "model",
++          "outputs": [
++            "out"
++          ],
++          "params": {
++            "seed": 410
++          },
++          "tool": "json_materialize",
++          "version": "b-generic-3"
++        },
++        "id": "build_configuration",
++        "kind": "model",
++        "label": "Build Configuration",
++        "provenance": {
++          "evidence": [
++            {
++              "source": "Synthetic acceptance fixture / build_configuration"
++            }
++          ],
++          "mode": "extracted"
++        }
++      },
++      {
++        "branch_id": "main",
++        "execution": {
++          "inputs": {
++            "configuration": {
++              "kind": "node_output",
++              "node_id": "build_configuration",
++              "output": "out"
++            },
++            "content": {
++              "kind": "variable",
++              "variable_id": "review_note"
++            }
++          },
++          "kind": "model",
++          "outputs": [
++            "out"
++          ],
++          "params": {
++            "seed": 410
++          },
++          "tool": "text_materialize",
++          "version": "b-generic-3"
++        },
++        "id": "review_note",
++        "kind": "model",
++        "label": "Review Note",
++        "provenance": {
++          "evidence": [
++            {
++              "source": "Synthetic acceptance fixture / review_note"
++            }
++          ],
++          "mode": "inferred"
++        }
++      },
++      {
++        "branch_id": "main",
++        "execution": {
++          "inputs": {
++            "config": {
++              "kind": "node_output",
++              "node_id": "build_configuration",
++              "output": "out"
++            },
++            "record": {
++              "kind": "node_output",
++              "node_id": "capture_note",
++              "output": "out"
++            },
++            "review": {
++              "kind": "node_output",
++              "node_id": "review_note",
++              "output": "out"
++            }
++          },
++          "kind": "model",
++          "outputs": [
++            "out"
++          ],
++          "params": {
++            "layout": {
++              "cell_height": 192,
++              "columns": 1
++            }
++          },
++          "tool": "layout_compose",
++          "version": "b-generic-3"
++        },
++        "id": "release_report",
++        "kind": "composition",
++        "label": "Release Report",
++        "provenance": {
++          "evidence": [
++            {
++              "source": "Synthetic acceptance fixture / release_report"
++            }
++          ],
++          "mode": "inferred"
++        }
++      },
++      {
++        "branch_id": "discarded",
++        "execution": {
++          "inputs": {
++            "prompt": {
++              "kind": "literal",
++              "value": "Rejected experiment"
++            }
++          },
++          "kind": "model",
++          "outputs": [
++            "out"
++          ],
++          "params": {
++            "seed": 410
++          },
++          "tool": "image_gen",
++          "version": "b-generic-3"
++        },
++        "id": "rejected_experiment",
++        "kind": "model",
++        "label": "Rejected Experiment",
++        "provenance": {
++          "evidence": [
++            {
++              "source": "Synthetic acceptance fixture / rejected_experiment"
++            }
++          ],
++          "mode": "extracted"
++        }
++      }
++    ],
++    "parent_revision_id": null,
++    "revision_id": "7b881aa8-aaf2-4f71-8f33-9173a9b687f0"
++  },
++  "harnesses": [],
++  "history": [],
++  "interactive_questions": [
++    {
++      "id": "q-framework",
++      "modes": [
++        "keep",
++        "override",
++        "append"
++      ],
++      "prompt": "framework",
++      "variable_id": "framework"
++    },
++    {
++      "id": "q-review_note",
++      "modes": [
++        "keep",
++        "override",
++        "append"
++      ],
++      "prompt": "review_note",
++      "variable_id": "review_note"
++    }
++  ],
++  "metadata": {
++    "attribution": "Synthetic acceptance input; not an actual captured creation history",
++    "created_at": "2026-10-17T05:48:04.000600Z",
++    "external_links": [
++      "https://github.com/AiCA-Team/AiCA",
++      "https://www.bilibili.com/",
++      "https://www.youtube.com/",
++      "https://huggingface.co/"
++    ],
++    "project_id": "08bfac2d-7252-4059-94eb-d1c2806e6bd8",
++    "source_mode": "mixed",
++    "title": "03 / Self archive - extracted development record",
++    "updated_at": "2026-10-17T05:48:04.000600Z"
++  },
++  "runs": [],
++  "sessions": [],
++  "snapshot": {
++    "commit_seq": 0,
++    "complete": true,
++    "gaps": [],
++    "snapshot_id": "023b7c1e-2821-43d6-8f8d-cfd855740910",
++    "stream_id": "8b6c5125-5515-4b25-b55f-7828f605e819"
++  },
++  "variable_operations": [],
++  "variables": {
++    "framework": {
++      "bindings": [
++        {
++          "input": "content",
++          "node_id": "build_configuration"
++        }
++      ],
++      "default": "FastAPI",
++      "modes": [
++        "keep",
++        "override",
++        "append"
++      ],
++      "separator": ", ",
++      "type": "string",
++      "value": "FastAPI"
++    },
++    "review_note": {
++      "bindings": [
++        {
++          "input": "content",
++          "node_id": "review_note"
++        }
++      ],
++      "default": "Recommended path requires human review.",
++      "modes": [
++        "keep",
++        "override",
++        "append"
++      ],
++      "separator": ", ",
++      "type": "string",
++      "value": "Recommended path requires human review."
++    }
++  }
++}
+\ No newline at end of file
+diff --git a/examples/workflows/field-guide.aica.json b/examples/workflows/field-guide.aica.json
+new file mode 100644
+--- /dev/null
++++ b/examples/workflows/field-guide.aica.json
+@@ -0,0 +1,390 @@
++{
++  "agents": [],
++  "aica_version": "0.1",
++  "artifacts": [],
++  "extensions": {
++    "aica.acceptance": {
++      "synthetic": true
++    }
++  },
++  "graph": {
++    "branches": [
++      {
++        "id": "main",
++        "parent_id": null,
++        "state": "active"
++      }
++    ],
++    "edges": [
++      {
++        "id": "biome_notes-wildlife_plate-notes",
++        "kind": "data",
++        "source": "biome_notes",
++        "source_output": "out",
++        "target": "wildlife_plate",
++        "target_input": "notes"
++      },
++      {
++        "id": "biome_notes-habitat_plate-notes",
++        "kind": "data",
++        "source": "biome_notes",
++        "source_output": "out",
++        "target": "habitat_plate",
++        "target_input": "notes"
++      },
++      {
++        "id": "wildlife_plate-field_guide-animal",
++        "kind": "data",
++        "source": "wildlife_plate",
++        "source_output": "out",
++        "target": "field_guide",
++        "target_input": "animal"
++      },
++      {
++        "id": "habitat_plate-field_guide-environment",
++        "kind": "data",
++        "source": "habitat_plate",
++        "source_output": "out",
++        "target": "field_guide",
++        "target_input": "environment"
++      },
++      {
++        "id": "swatches-field_guide-swatches",
++        "kind": "data",
++        "source": "swatches",
++        "source_output": "out",
++        "target": "field_guide",
++        "target_input": "swatches"
++      }
++    ],
++    "golden_path": [],
++    "nodes": [
++      {
++        "branch_id": "main",
++        "execution": {
++          "inputs": {
++            "content": {
++              "kind": "variable",
++              "variable_id": "environment"
++            }
++          },
++          "kind": "model",
++          "outputs": [
++            "out"
++          ],
++          "params": {
++            "seed": 410
++          },
++          "tool": "text_materialize",
++          "version": "b-generic-3"
++        },
++        "id": "biome_notes",
++        "kind": "model",
++        "label": "Biome Notes",
++        "provenance": {
++          "evidence": [
++            {
++              "source": "Synthetic acceptance fixture / biome_notes"
++            }
++          ],
++          "mode": "extracted"
++        }
++      },
++      {
++        "branch_id": "main",
++        "execution": {
++          "inputs": {
++            "content": {
++              "kind": "variable",
++              "variable_id": "color_palette"
++            }
++          },
++          "kind": "model",
++          "outputs": [
++            "out"
++          ],
++          "params": {
++            "seed": 410
++          },
++          "tool": "text_materialize",
++          "version": "b-generic-3"
++        },
++        "id": "swatches",
++        "kind": "model",
++        "label": "Swatches",
++        "provenance": {
++          "evidence": [
++            {
++              "source": "Synthetic acceptance fixture / swatches"
++            }
++          ],
++          "mode": "recorded"
++        }
++      },
++      {
++        "branch_id": "main",
++        "execution": {
++          "inputs": {
++            "notes": {
++              "kind": "node_output",
++              "node_id": "biome_notes",
++              "output": "out"
++            },
++            "prompt": {
++              "kind": "template",
++              "template": "watercolor {{creature}} in {{place}}",
++              "variables": {
++                "creature": "creature",
++                "place": "environment"
++              }
++            },
++            "style": {
++              "kind": "variable",
++              "variable_id": "color_palette"
++            }
++          },
++          "kind": "model",
++          "outputs": [
++            "out"
++          ],
++          "params": {
++            "seed": 410
++          },
++          "tool": "image_gen",
++          "version": "b-generic-3"
++        },
++        "id": "wildlife_plate",
++        "kind": "model",
++        "label": "Wildlife Plate",
++        "provenance": {
++          "evidence": [
++            {
++              "source": "Synthetic acceptance fixture / wildlife_plate"
++            }
++          ],
++          "mode": "recorded"
++        }
++      },
++      {
++        "branch_id": "main",
++        "execution": {
++          "inputs": {
++            "notes": {
++              "kind": "node_output",
++              "node_id": "biome_notes",
++              "output": "out"
++            },
++            "prompt": {
++              "kind": "template",
++              "template": "watercolor forest landscape {{place}}",
++              "variables": {
++                "place": "environment"
++              }
++            },
++            "style": {
++              "kind": "variable",
++              "variable_id": "color_palette"
++            }
++          },
++          "kind": "model",
++          "outputs": [
++            "out"
++          ],
++          "params": {
++            "seed": 410
++          },
++          "tool": "image_gen",
++          "version": "b-generic-3"
++        },
++        "id": "habitat_plate",
++        "kind": "model",
++        "label": "Habitat Plate",
++        "provenance": {
++          "evidence": [
++            {
++              "source": "Synthetic acceptance fixture / habitat_plate"
++            }
++          ],
++          "mode": "recorded"
++        }
++      },
++      {
++        "branch_id": "main",
++        "execution": {
++          "inputs": {
++            "animal": {
++              "kind": "node_output",
++              "node_id": "wildlife_plate",
++              "output": "out"
++            },
++            "environment": {
++              "kind": "node_output",
++              "node_id": "habitat_plate",
++              "output": "out"
++            },
++            "swatches": {
++              "kind": "node_output",
++              "node_id": "swatches",
++              "output": "out"
++            }
++          },
++          "kind": "model",
++          "outputs": [
++            "out"
++          ],
++          "params": {
++            "layout": {
++              "direction": "horizontal",
++              "input_ports": [
++                "animal",
++                "environment"
++              ]
++            }
++          },
++          "tool": "layout_compose",
++          "version": "b-generic-3"
++        },
++        "id": "field_guide",
++        "kind": "composition",
++        "label": "Field Guide",
++        "provenance": {
++          "evidence": [
++            {
++              "source": "Synthetic acceptance fixture / field_guide"
++            }
++          ],
++          "mode": "recorded"
++        }
++      }
++    ],
++    "parent_revision_id": null,
++    "revision_id": "cdb17e5a-0a8e-4384-9a23-12b1d2b4d94d"
++  },
++  "harnesses": [],
++  "history": [],
++  "interactive_questions": [
++    {
++      "id": "q-environment",
++      "modes": [
++        "keep",
++        "override",
++        "append"
++      ],
++      "prompt": "environment",
++      "variable_id": "environment"
++    },
++    {
++      "id": "q-creature",
++      "modes": [
++        "keep",
++        "override",
++        "append"
++      ],
++      "prompt": "creature",
++      "variable_id": "creature"
++    },
++    {
++      "id": "q-color_palette",
++      "modes": [
++        "keep",
++        "override",
++        "append"
++      ],
++      "prompt": "color_palette",
++      "variable_id": "color_palette"
++    }
++  ],
++  "metadata": {
++    "attribution": "Synthetic acceptance input; not an actual captured creation history",
++    "created_at": "2026-10-17T05:48:03.498960Z",
++    "external_links": [
++      "https://github.com/AiCA-Team/AiCA",
++      "https://www.bilibili.com/",
++      "https://www.youtube.com/",
++      "https://huggingface.co/"
++    ],
++    "project_id": "ec8ee217-fa2c-4231-9aba-c3135d444342",
++    "source_mode": "mixed",
++    "title": "02 / Watercolor field guide",
++    "updated_at": "2026-10-17T05:48:03.498960Z"
++  },
++  "runs": [],
++  "sessions": [],
++  "snapshot": {
++    "commit_seq": 0,
++    "complete": true,
++    "gaps": [],
++    "snapshot_id": "c4c7e148-a870-464d-a765-237acbd323fa",
++    "stream_id": "9bf40aa4-a948-43e4-b244-226d49fe4845"
++  },
++  "variable_operations": [],
++  "variables": {
++    "color_palette": {
++      "bindings": [
++        {
++          "input": "content",
++          "node_id": "swatches"
++        },
++        {
++          "input": "style",
++          "node_id": "wildlife_plate"
++        },
++        {
++          "input": "style",
++          "node_id": "habitat_plate"
++        }
++      ],
++      "default": "watercolor sage and rose",
++      "modes": [
++        "keep",
++        "override",
++        "append"
++      ],
++      "separator": ", ",
++      "type": "string",
++      "value": "watercolor sage and rose"
++    },
++    "creature": {
++      "bindings": [
++        {
++          "input": "prompt",
++          "node_id": "wildlife_plate"
++        }
++      ],
++      "default": "small dragon",
++      "modes": [
++        "keep",
++        "override",
++        "append"
++      ],
++      "separator": ", ",
++      "type": "string",
++      "value": "small dragon"
++    },
++    "environment": {
++      "bindings": [
++        {
++          "input": "content",
++          "node_id": "biome_notes"
++        },
++        {
++          "input": "prompt",
++          "node_id": "wildlife_plate"
++        },
++        {
++          "input": "prompt",
++          "node_id": "habitat_plate"
++        }
++      ],
++      "default": "misty forest",
++      "modes": [
++        "keep",
++        "override",
++        "append"
++      ],
++      "separator": ", ",
++      "type": "string",
++      "value": "misty forest"
++    }
++  }
++}
+\ No newline at end of file

@@ -1,0 +1,148 @@
+{
+  "groups": [
+    {
+      "key": "step-plan",
+      "kind": "intent",
+      "label": "确定创作目标",
+      "source_node_ids": [
+        "raw-plan"
+      ],
+      "purpose": {
+        "text": "用户要求太空漫画与配乐。",
+        "attributed_to": "user",
+        "actor_id": null,
+        "speech_act": "request",
+        "evidence_ids": [
+          "e-message-1"
+        ],
+        "origin": "llm",
+        "review": "candidate"
+      },
+      "requirements": [],
+      "evidence_ids": [
+        "e-node-0",
+        "e-message-1"
+      ]
+    },
+    {
+      "key": "step-character",
+      "kind": "generation",
+      "label": "生成并修订角色图",
+      "source_node_ids": [
+        "raw-character-first",
+        "raw-character-revised"
+      ],
+      "purpose": {
+        "text": "Agent 最初选择黑猫与水彩，用户随后保留黑猫并要求红色宇航服。",
+        "attributed_to": "analyst",
+        "actor_id": null,
+        "speech_act": "interpretation",
+        "evidence_ids": [
+          "e-message-2",
+          "e-message-3"
+        ],
+        "origin": "llm",
+        "review": "candidate"
+      },
+      "requirements": [],
+      "evidence_ids": [
+        "e-node-1",
+        "e-node-2",
+        "e-message-2",
+        "e-message-3"
+      ]
+    },
+    {
+      "key": "step-panel",
+      "kind": "generation",
+      "label": "生成月球分镜",
+      "source_node_ids": [
+        "raw-panel"
+      ],
+      "purpose": {
+        "text": "用户要求使用新角色图绘制月球分镜。",
+        "attributed_to": "user",
+        "actor_id": null,
+        "speech_act": "request",
+        "evidence_ids": [
+          "e-message-3"
+        ],
+        "origin": "llm",
+        "review": "candidate"
+      },
+      "requirements": [],
+      "evidence_ids": [
+        "e-node-3",
+        "e-message-3"
+      ]
+    },
+    {
+      "key": "step-audio",
+      "kind": "generation",
+      "label": "生成配乐",
+      "source_node_ids": [
+        "raw-audio"
+      ],
+      "purpose": {
+        "text": "用户要求为作品配乐。",
+        "attributed_to": "user",
+        "actor_id": null,
+        "speech_act": "request",
+        "evidence_ids": [
+          "e-message-1"
+        ],
+        "origin": "llm",
+        "review": "candidate"
+      },
+      "requirements": [],
+      "evidence_ids": [
+        "e-node-4",
+        "e-message-1"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source_key": "step-character",
+      "target_key": "step-panel",
+      "kind": "data",
+      "explanation": {
+        "text": "A 定义明确的 image → reference_image 绑定。",
+        "attributed_to": "analyst",
+        "actor_id": null,
+        "speech_act": "interpretation",
+        "evidence_ids": [
+          "e-node-2",
+          "e-node-3"
+        ],
+        "origin": "llm",
+        "review": "candidate"
+      }
+    }
+  ],
+  "variables": [
+    {
+      "group_key": "step-character",
+      "label": "角色生成提示词",
+      "locator": {
+        "source_node_id": "raw-character-revised",
+        "evidence_id": "e-node-2",
+        "pointer": "/execution/inputs/arguments/value",
+        "decode": "json_string",
+        "value_pointer": "/prompt"
+      },
+      "description": {
+        "text": "可修改修订角色图的提示词。",
+        "attributed_to": "analyst",
+        "actor_id": null,
+        "speech_act": "interpretation",
+        "evidence_ids": [
+          "e-node-2"
+        ],
+        "origin": "llm",
+        "review": "candidate"
+      }
+    }
+  ],
+  "unresolved": []
+}

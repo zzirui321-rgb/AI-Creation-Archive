@@ -1,0 +1,30 @@
+{
+  "aica_version": "0.1",
+  "metadata": {"project_id": "fixture-project", "title": "Synthetic comic fixture", "source_mode": "extracted", "created_at": "2026-10-16T00:00:00Z", "updated_at": "2026-10-16T00:00:00Z", "external_links": []},
+  "variables": {
+    "character": {"type": "string", "default": "cyberpunk girl", "value": "cyberpunk girl", "separator": ", ", "modes": ["keep", "override", "append"], "bindings": [{"node_id": "character", "input": "prompt"}]},
+    "tags": {"type": "array", "default": ["comic"], "value": ["comic"], "modes": ["keep", "override", "append"], "bindings": [], "items_schema": {"type": "string"}},
+    "steps": {"type": "integer", "default": 20, "value": 20, "modes": ["keep", "override"], "bindings": []}
+  },
+  "interactive_questions": [{"id": "Q2", "variable_id": "character", "prompt": "Who is the character?", "modes": ["keep", "override", "append"]}],
+  "variable_operations": [],
+  "graph": {
+    "revision_id": "fixture-revision", "parent_revision_id": null,
+    "nodes": [
+      {"id": "story", "kind": "prompt", "label": "Story", "branch_id": "main", "provenance": {"mode": "extracted", "evidence": [{"source": "synthetic-fixture"}]}, "execution": {"kind": "manual", "tool": "story", "version": null, "inputs": {}, "params": {}, "outputs": ["text"]}},
+      {"id": "character", "kind": "model", "label": "Character", "branch_id": "main", "provenance": {"mode": "extracted", "evidence": [{"source": "synthetic-fixture"}]}, "execution": {"kind": "model", "tool": "image-provider", "version": null, "model": null, "inputs": {"prompt": {"kind": "variable", "variable_id": "character"}}, "params": {}, "outputs": ["image"]}},
+      {"id": "panel", "kind": "composition", "label": "Panel", "branch_id": "main", "provenance": {"mode": "extracted", "evidence": [{"source": "synthetic-fixture"}]}, "execution": {"kind": "manual", "tool": "layout", "version": null, "inputs": {"story": {"kind": "node_output", "node_id": "story", "output": "text"}, "image": {"kind": "node_output", "node_id": "character", "output": "image"}}, "params": {}, "outputs": ["page"]}},
+      {"id": "discarded", "kind": "decision", "label": "Rejected direction", "branch_id": "trial", "provenance": {"mode": "extracted", "evidence": [{"source": "synthetic-fixture"}]}}
+    ],
+    "edges": [
+      {"id": "story-panel", "source": "story", "target": "panel", "kind": "data", "source_output": "text", "target_input": "story"},
+      {"id": "character-panel", "source": "character", "target": "panel", "kind": "data", "source_output": "image", "target_input": "image"},
+      {"id": "story-trial", "source": "story", "target": "discarded", "kind": "control"}
+    ],
+    "branches": [{"id": "main", "parent_id": null, "state": "active"}, {"id": "trial", "parent_id": "main", "state": "dead_end", "reason": "Synthetic rejected attempt"}],
+    "golden_path": ["story", "character", "panel"]
+  },
+  "artifacts": [], "harnesses": [], "agents": [], "sessions": [], "runs": [], "history": [],
+  "snapshot": {"stream_id": "fixture-stream", "snapshot_id": "fixture-snapshot", "commit_seq": 0, "complete": true, "gaps": []},
+  "extensions": {"aica.fixture": true}
+}

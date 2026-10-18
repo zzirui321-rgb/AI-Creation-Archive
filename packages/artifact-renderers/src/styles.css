@@ -1,0 +1,95 @@
+.aica-artifacts { --aica-ink: #20242b; --aica-muted: #626b75; --aica-line: #d9dfe4; --aica-surface: #f5f7f8; color: var(--aica-ink); font: 14px/1.5 Inter, "Segoe UI", Arial, sans-serif; letter-spacing: 0; min-width: 0; }
+.aica-artifacts *, .aica-artifacts *::before, .aica-artifacts *::after { box-sizing: border-box; }
+.aica-artifacts h3 { font-size: 17px; margin: 0; overflow-wrap: anywhere; }
+.aica-artifacts p { margin: 4px 0 12px; }
+.aica-artifacts button, .aica-artifacts .aica-icon { display: inline-flex; align-items: center; justify-content: center; min-width: 32px; min-height: 32px; padding: 6px; border: 1px solid var(--aica-line); border-radius: 4px; color: inherit; background: white; cursor: pointer; flex-shrink: 0; }
+.aica-artifacts button:hover, .aica-artifacts .aica-icon:hover { background: #eaf7f2; }
+.aica-artifacts :focus-visible { outline: 2px solid #177c65; outline-offset: 3px; }
+.aica-artifacts a { color: #176853; text-decoration: none; overflow-wrap: anywhere; }
+.aica-artifacts a:hover { text-decoration: underline; }
+.aica-toolbar { display: flex; gap: 8px; align-items: center; min-height: 44px; padding: 6px 0; flex-wrap: wrap; }
+.aica-spacer { flex: 1; }
+.aica-stage, .aica-state, .aica-source { display: inline-block; font-size: 12px; font-weight: 700; padding: 4px 8px; border-radius: 3px; overflow-wrap: anywhere; }
+.aica-stage { background: #e4eeeb; color: #285e50; }
+.aica-stage.is-draft { color: #854522; background: #fff0d7; }
+.aica-source { background: #f9e5ed; color: #8c3758; }
+.aica-state { background: #eef0f3; color: #505863; }
+.state-CACHE_HIT { background: #d5f0df; color: #18542f; border-left: 3px solid #26834a; }
+.state-RECOMPUTE { background: #fff0bd; color: #795200; border-left: 3px solid #d59a00; }
+.state-REBUILD { background: #dfedff; color: #164d90; border-left: 3px solid #367dce; }
+.source-live { background: #dff1e7; color: #1c613c; }
+.source-prewarmed { background: #e4edff; color: #315792; }
+.source-fallback { background: #fbe4ee; color: #8c3158; }
+.source-local, .source-unknown { background: #eceff2; color: #535d68; }
+.aica-reuse { padding: 12px 0 16px; }
+.aica-reuse-heading { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 9px; }
+.aica-reuse-heading > span:first-child { color: #596673; font-size: 12px; }
+.aica-reuse-heading > strong { color: #18542f; font-size: 18px; }
+.aica-reuse-heading > span:last-child { margin-left: auto; color: #18542f; font-weight: 700; }
+.aica-reuse-track { display: flex; height: 10px; width: 100%; overflow: hidden; background: #e7ebef; border-radius: 3px; }
+.aica-reuse-track > span { display: block; height: 100%; }
+.reuse-hit { background: #29894e; }
+.reuse-compute { background: #e6ad26; }
+.reuse-build { background: #4289d4; }
+.aica-reuse .aica-statistics { padding: 10px 0 0; gap: 8px 22px; }
+.aica-reuse .aica-statistics strong { font-size: 17px; }
+.aica-segmented { display: inline-flex; gap: 2px; }
+.aica-artifacts .aica-segmented button[aria-pressed="true"] { background: #dceee7; border-color: #53947e; }
+.aica-image, .aica-video { display: block; width: 100%; height: auto; max-height: 760px; object-fit: contain; background: #eceff2; }
+.aica-audio { width: 100%; min-height: 56px; }
+.aica-web { display: block; width: 100%; height: 420px; border: 1px solid var(--aica-line); background: white; }
+.aica-code { margin: 0; padding: 18px; max-height: 480px; overflow: auto; background: #f2f4f6; font: 13px/1.65 Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
+.aica-markdown { padding: 16px 0; overflow-wrap: anywhere; }
+.aica-markdown h1 { font-size: 20px; margin: 0 0 12px; }
+.aica-markdown h2 { font-size: 18px; margin: 16px 0 10px; }
+.aica-markdown h3 { font-size: 16px; margin: 12px 0 8px; }
+.aica-markdown pre { overflow: auto; }
+.aica-empty { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; min-height: 160px; padding: 20px; background: var(--aica-surface); color: var(--aica-muted); text-align: center; overflow-wrap: anywhere; }
+.aica-panel-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr)); gap: 12px; }
+.aica-artifacts .aica-panel { display: flex; flex-direction: column; gap: 8px; align-items: stretch; padding: 8px; border: 1px solid var(--aica-line); border-radius: 6px; min-width: 0; }
+.aica-panel .aica-image { aspect-ratio: 3/2; max-height: 260px; }
+.aica-panel .aica-state { align-self: start; }
+.aica-artifacts .aica-panel-label { text-align: left; justify-content: flex-start; overflow-wrap: anywhere; white-space: normal; }
+.aica-panel:has([aria-pressed="true"]) { border-color: #177c65; box-shadow: 0 0 0 1px #177c65; }
+.aica-panel-details { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 8px 12px; margin: 12px 0; padding: 12px 0; border-top: 1px solid var(--aica-line); }
+.aica-panel-details dt { font-weight: 650; }
+.aica-panel-details dd { margin: 0; overflow-wrap: anywhere; }
+.aica-diff-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.aica-diff-column { min-width: 0; }
+.aica-statistics { display: flex; flex-wrap: wrap; gap: 12px 28px; padding: 12px 0 20px; }
+.aica-statistics strong { font-size: 20px; margin-right: 4px; }
+.aica-table-scroll { overflow-x: auto; margin-top: 24px; }
+.aica-artifacts table { width: 100%; min-width: 520px; border-collapse: collapse; text-align: left; font-size: 12px; }
+.aica-artifacts caption { text-align: left; font-size: 14px; font-weight: 650; padding: 0 0 10px; }
+.aica-artifacts th, .aica-artifacts td { border-bottom: 1px solid var(--aica-line); padding: 10px 8px; overflow-wrap: anywhere; max-width: 260px; }
+.aica-artifacts thead { background: var(--aica-surface); }
+.aica-artifacts th[scope="row"] { min-width: 100px; }
+.aica-artifacts thead th, .aica-artifacts td .aica-state { white-space: nowrap; }
+.aica-muted { color: var(--aica-muted); }
+.aica-explore-card { border: 1px solid var(--aica-line); border-radius: 6px; overflow: hidden; background: white; }
+.aica-card-body { padding: 16px; }
+.aica-card-heading { display: flex; gap: 8px; align-items: flex-start; }
+.aica-card-heading h3 { flex: 1; }
+.aica-card-preview .aica-image { height: 220px; object-fit: contain; }
+.aica-card-preview .aica-toolbar { padding-left: 12px; padding-right: 12px; }
+.aica-tags, .aica-links { display: flex; flex-wrap: wrap; gap: 6px 10px; }
+.aica-tags > span { display: inline-block; font-size: 11px; padding: 3px 6px; border-radius: 3px; background: #edf0f3; overflow-wrap: anywhere; max-width: 100%; }
+.aica-provenance { display: grid; gap: 10px; margin-top: 12px; }
+.aica-links a { display: inline-flex; gap: 4px; align-items: center; font-size: 12px; }
+.aica-tags > .aica-provenance-inferred { background: #fff0d7; }
+.aica-tags > .aica-provenance-recorded { background: #e1f0e9; }
+.aica-tags > .aica-provenance-extracted { background: #e8edf7; }
+@media (max-width: 640px) { .aica-diff-columns { grid-template-columns: minmax(0, 1fr); gap: 28px; } .aica-toolbar { gap: 5px; } .aica-statistics { gap: 8px 16px; } }
+.aica-edit-picker { min-width: 0; }
+.aica-edit-canvas { position: relative; width: 100%; background: #eceef0; overflow: hidden; }
+.aica-edit-canvas > img:first-child { display: block; width: 100%; height: 100%; object-fit: contain; }
+.aica-edit-mask { position: absolute; inset: 0; background: #20bc83; opacity: .42; pointer-events: none; mask-size: 100% 100%; mask-repeat: no-repeat; }
+.aica-edit-mask-probe { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.aica-edit-bound { position: absolute; padding: 0 !important; border: 2px solid #d2a22e !important; background: transparent !important; border-radius: 0 !important; }
+.aica-edit-bound[aria-pressed="true"] { border-color: #19a273 !important; outline: 2px solid white; outline-offset: -4px; }
+.aica-edit-bound > span { position: absolute; top: 0; left: 0; min-width: 22px; height: 22px; background: #174436; color: white; font-size: 12px; display: grid; place-items: center; }
+.aica-edit-toggle { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
+.aica-edit-candidates { display: flex; gap: 8px; flex-wrap: wrap; padding: 12px; }
+.aica-edit-candidates button { display: grid; gap: 4px; text-align: left; min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
+.aica-edit-candidates button[aria-pressed="true"] { outline: 2px solid #19875f; }
+.aica-edit-candidates span { font-size: 12px; color: #53615b; }

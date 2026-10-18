@@ -1,0 +1,71 @@
+{
+  "$defs": {
+    "LayoutPosition": {
+      "additionalProperties": false,
+      "properties": {
+        "node_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Node Id",
+          "type": "string"
+        },
+        "x": {
+          "title": "X",
+          "type": "number"
+        },
+        "y": {
+          "title": "Y",
+          "type": "number"
+        }
+      },
+      "required": [
+        "node_id",
+        "x",
+        "y"
+      ],
+      "title": "LayoutPosition",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "request_id": {
+      "maxLength": 200,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+      "title": "Request Id",
+      "type": "string"
+    },
+    "graph_revision_id": {
+      "maxLength": 200,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+      "title": "Graph Revision Id",
+      "type": "string"
+    },
+    "expected_layout_version": {
+      "minimum": 0,
+      "title": "Expected Layout Version",
+      "type": "integer"
+    },
+    "positions": {
+      "items": {
+        "$ref": "#/$defs/LayoutPosition"
+      },
+      "maxItems": 200,
+      "title": "Positions",
+      "type": "array"
+    }
+  },
+  "required": [
+    "request_id",
+    "graph_revision_id",
+    "expected_layout_version",
+    "positions"
+  ],
+  "title": "LayoutUpdate",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:aica:semantic-design:0.1:LayoutUpdate"
+}

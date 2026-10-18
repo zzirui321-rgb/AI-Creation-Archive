@@ -1,0 +1,35 @@
+.exec-workspace { max-width: 1600px; margin: auto; padding: 24px; color: #cddde3; }
+.exec-workspace>header { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-bottom: 22px; }
+.exec-workspace>header>div { flex: 1; min-width: 200px; }
+.exec-workspace h1 { font-size: 25px; line-height: 1.4; margin-top: 16px; overflow-wrap: anywhere; }
+.exec-workspace h2 { font-size: 17px; margin: 18px 0; }
+.exec-workspace input[type=file] { width: 1px; position: absolute; opacity: 0; }
+.exec-projects { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 24px; }
+.exec-projects a { padding: 8px 12px; border-bottom: 2px solid #3d5c68; max-width: 100%; overflow-wrap: anywhere; font-size: 12px; }
+.exec-projects a[aria-current=page] { border-color: #a2d5a4; }
+.exec-layout { display: grid; grid-template-columns: minmax(0,1fr) 320px; gap: 24px; }
+.exec-main { min-width: 0; }
+.exec-main .graph-explorer { min-height: 440px; }
+.exec-variables { border-left: 1px solid #38505b; padding-left: 20px; min-width: 0; }
+.exec-variables fieldset { border: 0; margin: 22px 0; padding: 0; min-width: 0; }
+.exec-variables legend { font-size: 13px; margin-bottom: 10px; }
+.exec-variables fieldset>div { display: flex; gap: 6px; margin: 8px 0; flex-wrap: wrap; }
+.exec-variables .button { padding: 7px 10px; font-size: 12px; }
+.exec-variables [aria-pressed=true], .exec-stage [aria-pressed=true] { border-color: #a6cfa8; color: #a6cfa8; }
+.exec-variables textarea { width: 100%; min-height: 80px; resize: vertical; background: #101e27; color: #d8e2e6; border: 1px solid #405763; padding: 10px; }
+.exec-variables>label { display: flex; gap: 8px; padding: 10px 0; font-size: 12px; }
+.exec-variable-id { color: #8eabb6; font: 11px monospace; }
+.exec-stage { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 20px 0; }
+.exec-stage label { font-size: 12px; }
+.exec-artifacts { display: grid; gap: 20px; }
+.exec-provider { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; font-size: 12px; margin: 16px 0; }
+.exec-main>.aica-artifacts, .exec-artifacts .aica-artifacts { padding: 16px; background: #f5f7f7; border-radius: 4px; }
+.exec-artifact-hash { overflow-wrap: anywhere; font: 11px/1.6 monospace; color: #a8bec8; margin: 12px 0; }
+.exec-plan { padding: 0; list-style: none; }
+.exec-plan li { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; font: 12px monospace; padding: 8px 0; overflow-wrap: anywhere; }
+.exec-plan .aica-state { font-size: 10px; padding: 4px; }
+.state-CACHE_HIT { color: #154e2e; background: #b8e4c9; }.state-RECOMPUTE { color: #634600; background: #f5d674; }.state-REBUILD { color: #174675; background: #bed8f3; }
+.exec-node-detail, .exec-history { margin: 22px 0; border-top: 1px solid #38505b; padding-top: 16px; }
+.exec-node-detail pre, .exec-history pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 360px; overflow: auto; font: 12px/1.6 monospace; margin: 15px 0; }
+.exec-history>div { padding: 14px 0; border-bottom: 1px solid #38505b; font-size: 12px; }
+@media(max-width:900px) { .exec-layout { grid-template-columns: minmax(0,1fr); } .exec-variables { border-left: 0; border-top: 1px solid #38505b; padding: 16px 0; } .exec-workspace { padding: 16px; } }

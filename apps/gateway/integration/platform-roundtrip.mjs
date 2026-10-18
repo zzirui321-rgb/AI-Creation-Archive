@@ -1,0 +1,35 @@
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import { PlatformClient } from './platform-client.mjs';
+
+const [base, bundlePath] = process.argv.slice(2);
+const alice = new PlatformClient(base);
+const bob = new PlatformClient(base);
+const anonymous = new PlatformClient(base);
+await alice.register({ username: 'alice', name: 'Alice', password: 'alice-test-password-2026' });
+await bob.register({ username: 'bob', name: 'Bob', password: 'bob-test-password-2026' });
+await alice.login('alice', 'alice-test-password-2026');
+await bob.login('bob', 'bob-test-password-2026');
+const { repository } = await alice.createRepository({ name: 'real-http', title: 'Graph platform', visibility: 'private' });
+const document = { format: 'aica-ui-module-record', steps: [{ id: 'concept', prompt: 'A cat' }, { id: 'render', prompt: 'Draw it' }],
+  edges: [{ source: 'concept', target: 'render' }], golden_path: ['concept', 'render'] };
+const { commit } = await alice.commit(repository.id, document, { expectedHead: null });
+await assert.rejects(anonymous.repository(repository.id), error => error.status === 404);
+await alice.setVisibility(repository.id, 'public');
+assert.deepEqual((await anonymous.graph(repository.id)).document, document);
+assert.equal((await anonymous.repositories()).repositories[0].owner_username, 'alice');
+await alice.createBranch(repository.id, 'experiment/cat');
+const { repository: fork } = await bob.fork(repository.id, { name: 'forked', title: 'Fork' });
+const changed = { ...document, steps: [{ id: 'dog', prompt: 'A dog' }], edges: [], golden_path: ['dog'] };
+await bob.commit(fork.id, changed, { expectedHead: fork.head });
+assert.deepEqual((await anonymous.graph(repository.id)).document, document);
+await assert.rejects(alice.commit(repository.id, changed, { expectedHead: null }), error => error.status === 409);
+const { project } = await alice.createProject('Archive with a real image');
+const receipt = await alice.uploadBundle(project.id, await readFile(bundlePath));
+const archive = await alice.archiveCommit(repository.id, { projectId: project.id, importId: receipt.import_id, expectedHead: commit.id });
+const blob = await anonymous.artifactBlob(repository.id, archive.commit.id, 'output');
+assert.equal(blob.type, 'image/png');
+assert.ok(blob.size > 0);
+await alice.logout();
+await assert.rejects(alice.me(), error => error.status === 401);
+console.log('Real HTTP platform client roundtrip passed: login, upload, public/private reads, fork, branch, commit conflict, artifact, logout');

@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aica-schema"
+version = "0.1.0"
+description = "AiCA v0.1 archive and recording contracts"
+requires-python = ">=3.12,<3.13"
+dependencies = ["jsonschema>=4.26,<5"]
+
+[tool.setuptools.package-data]
+aica_schema = ["*.json"]

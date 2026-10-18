@@ -1,0 +1,10 @@
+{
+  "runtime_gateway": "6b98aa46fb097a899bbeef48642927824a8f2e2d",
+  "schema_mcp": "a0cc735646a2056a861182e43ccba53622d36f37",
+  "patches": [
+    "d-runtime.patch",
+    "d-request-providers.patch"
+  ],
+  "purpose": "isolated execution worker; main packages/runtime remains the semantic parser",
+  "history_included": false
+}

@@ -1,0 +1,85 @@
+diff --git a/apps/gateway/src/aica_gateway/app.py b/apps/gateway/src/aica_gateway/app.py
+--- a/apps/gateway/src/aica_gateway/app.py
++++ b/apps/gateway/src/aica_gateway/app.py
+@@ -10,7 +10,8 @@
+ 
+ from aica_mcp.files import ProjectLock
+ from aica_mcp.transfer import BUNDLE_LIMIT, CONTENT_TYPE, JSON_CONTENT_TYPE
+-from aica_runtime.executors import default_registry, execution_plan
++from aica_runtime.engine import replay_plan
++from aica_runtime.executors import default_registry
+ from aica_runtime.graph import golden_path
+ from aica_schema.protocol import PORTABLE_JSON_LIMIT, ProtocolError, loads, require, require_definition_snapshot
+ from fastapi import Depends, FastAPI, HTTPException, Query, Request
+@@ -230,9 +231,10 @@
+ 
+     @app.get("/api/projects/{project_id}/plan")
+     def plan(project_id: str, archive_id: str | None = None, target_node_ids: list[str] | None = Query(None),
+-             user: str = Depends(principal)):
++             stage: Literal["draft", "final"] = "draft", user: str = Depends(principal)):
+         document = store.read_archive(user, project_id, archive_id)["archive"]
+-        result = execution_plan(document, registry, target_node_ids)
++        result = replay_plan(document, registry, lambda key: store.cache_get(project_id, key),
++                             lambda sha256: store.read_blob(project_id, sha256), stage, target_node_ids)
+         return result
+ 
+     @app.get("/api/projects/{project_id}/golden-path")
+diff --git a/packages/runtime/src/aica_runtime/engine.py b/packages/runtime/src/aica_runtime/engine.py
+--- a/packages/runtime/src/aica_runtime/engine.py
++++ b/packages/runtime/src/aica_runtime/engine.py
+@@ -39,6 +39,46 @@
+         result = {key: replace_artifact_ids(item, replacements) for key, item in value.items()}
+         return result
+     return value
++
++
++def replay_plan(archive, registry, cache_get, read_blob, stage="draft", targets=None):
++    """Predict only verifiable hits; execution checks keys and bytes again."""
++    plan = execution_plan(archive, registry, targets)
++    if not plan["executable"]:
++        return {**plan, "decisions": {}, "stage": stage}
++    harness = {"name": "AiCA registered Runtime", "version": "0.1.0",
++               "config": {"executors": registry.describe()}, "state": {},
++               "availability": {"executors": "recorded"}}
++    outputs, keys, decisions = {}, {}, {}
++    nodes = active_nodes(archive)
++    artifacts = {item["id"]: item for item in archive["artifacts"]}
++    for identifier in plan["node_ids"]:
++        node = nodes[identifier]
++        parents = [edge["source"] for edge in archive["graph"]["edges"] if edge["target"] == identifier]
++        decision = "REBUILD" if node["kind"] == "composition" else "RECOMPUTE"
++        if all(parent in outputs for parent in parents):
++            execution = node["execution"]
++            tool = registry.resolve(execution)
++            inputs = resolve_inputs(archive, node, outputs)
++            controls = {edge["source"]: {"outputs": outputs[edge["source"]], "input_hash": keys[edge["source"]]}
++                        for edge in archive["graph"]["edges"] if edge["target"] == identifier and edge["kind"] == "control"}
++            key = cache_key(execution, inputs, controls, harness, tool, artifacts, stage)
++            cached = cache_get(key) if tool["cacheable"] else None
++            if cached is not None:
++                try:
++                    for artifact in cached["artifacts"]:
++                        read_blob(artifact["sha256"])
++                    outputs[identifier] = cached["outputs"]
++                    keys[identifier] = key
++                    artifacts.update({item["id"]: item for item in cached["artifacts"]})
++                    decision = "CACHE_HIT"
++                except ProtocolError as error:
++                    if error.code not in {"artifact_unavailable", "artifact_conflict"}:
++                        raise
++        decisions[identifier] = decision
++    return {**plan, "stage": stage, "decisions": decisions,
++            "statistics": {name: list(decisions.values()).count(value) for name, value in
++                           (("reused", "CACHE_HIT"), ("recomputed", "RECOMPUTE"), ("rebuilt", "REBUILD"))}}
+ 
+ 
+ class ExecutionContext:
+@@ -127,7 +167,7 @@
+         artifacts = {item["id"]: item for item in archive["artifacts"]}
+         key = cache_key(execution, inputs, controls, harness, tool, artifacts, stage)
+         run_id = new_id()
+-        cache = {"decision": "RECOMPUTE", "input_hash": key, "artifact_ids": []}
++        cache = {"decision": "REBUILD" if node["kind"] == "composition" else "RECOMPUTE", "input_hash": key, "artifact_ids": []}
+         run = {"id": run_id, "trace_id": self.source_id, "node_id": node["id"],
+                "revision_id": archive["graph"]["revision_id"], "session_id": self.session_id,
+                "agent_id": self.agent_id, "harness_id": self.harness_id, "state": "running",
