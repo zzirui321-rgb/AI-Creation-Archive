@@ -38,6 +38,20 @@ macOS/Linux 对应使用 `.venv/bin/python`。若当前 npm 限制锁文件中�
 
 默认只监听 `127.0.0.1`，数据保存在工作区外的当前用户应用数据目录。端口占用时使用其他 `--port`。使用 `--data-dir` 指定独立数据位置。服务不会自动注册开机启动。
 
+## Contributors · 团队成员
+
+AiCA 由以下成员共同完成。此仓库是团队成果的源码整合版，保留各成员的贡献归属。
+
+| 成员 | GitHub | 主要贡献 |
+|---|---|---|
+| A · 田新红 | [@Alvintxh](https://github.com/Alvintxh) | 采集与协议、MCP、Host 接入与归档契约 |
+| B · 张艺凡 | [@zhangyf332](https://github.com/zhangyf332) | 预览引擎、局部编辑、多模态产物渲染与对比 |
+| C · 张瑞雨 | [@ZRYYYZ](https://github.com/ZRYYYZ) | 图谱前端、创作工作台与交互 |
+| D · 舒彦智 | [@yean8266](https://github.com/yean8266) | 运行时、图解析、后端 API 与执行协作 |
+| E · 赵梓睿 | [@zzirui321-rgb](https://github.com/zzirui321-rgb) | 产品统筹、素材集成、路演与个人仓库整合 |
+
+原团队仓库：[AiCA-Team/AiCA](https://github.com/AiCA-Team/AiCA)。模块来源与版本见 [整合来源](docs/INTEGRATION_SOURCES.md)，署名与许可边界见 [NOTICE](NOTICE.md)。本库使用独立提交历史，GitHub 自动生成的 Contributors 统计不代表原团队完整贡献；以上名单记录团队署名，不授予仓库协作权限。
+
 ## 使用 MCP
 
 在真实创作目录启动，而不是本源码仓库：
